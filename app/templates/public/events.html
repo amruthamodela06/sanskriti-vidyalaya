@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Events & Calendar - {{ site_settings.get('site_name', 'Sanskriti Vidyalaya') }}{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="bg-primary text-white py-5">
+    <div class="container">
+        <h1><i class="bi bi-calendar-event me-2"></i>Events & Calendar</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('public.home') }}" class="text-white-50">Home</a></li>
+                <li class="breadcrumb-item active text-white">Events</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Upcoming Events -->
+            <div class="col-lg-8 mb-4">
+                <h2 class="mb-4"><i class="bi bi-calendar-plus me-2"></i>Upcoming Events</h2>
+                {% if upcoming %}
+                <div class="row g-4">
+                    {% for event in upcoming %}
+                    <div class="col-md-6">
+                        <div class="card h-100 event-card">
+                            {% if event.image_url %}
+                                <img src="{{ url_for('static', filename=event.image_url) }}" class="card-img-top" alt="{{ event.title }}" style="height: 150px; object-fit: cover;">
+                            {% endif %}
+                            <div class="card-body">
+                                <div class="d-flex mb-3">
+                                    <div class="event-date text-center bg-primary text-white rounded p-2 me-3" style="min-width: 60px;">
+                                        <div class="fw-bold fs-4">{{ event.event_date.strftime('%d') }}</div>
+                                        <small>{{ event.event_date.strftime('%b') }}</small>
+                                    </div>
+                                    <div>
+                                        <span class="badge bg-{{ 'info' if event.event_type == 'academic' else 'success' if event.event_type == 'cultural' else 'warning' if event.event_type == 'sports' else 'secondary' }} mb-1">{{ event.event_type|title }}</span>
+                                        <h5 class="card-title mb-0">{{ event.title }}</h5>
+                                    </div>
+                                </div>
+                                {% if event.description %}
+                                <p class="card-text text-muted small">{{ event.description[:100] }}...</p>
+                                {% endif %}
+                                <div class="text-muted small">
+                                    {% if event.event_time %}
+                                    <span><i class="bi bi-clock me-1"></i>{{ event.event_time.strftime('%I:%M %p') }}</span>
+                                    {% endif %}
+                                    {% if event.location %}
+                                    <span class="ms-3"><i class="bi bi-geo-alt me-1"></i>{{ event.location }}</span>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="text-center py-5 bg-light rounded">
+                    <i class="bi bi-calendar-x display-1 text-muted"></i>
+                    <p class="text-muted mt-3">No upcoming events at the moment.</p>
+                </div>
+                {% endif %}
+
+                <!-- Past Events -->
+                {% if past %}
+                <h3 class="mt-5 mb-4"><i class="bi bi-calendar-check me-2"></i>Past Events</h3>
+                <div class="list-group">
+                    {% for event in past %}
+                    <div class="list-group-item">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="mb-1">{{ event.title }}</h6>
+                                <small class="text-muted">
+                                    <i class="bi bi-calendar me-1"></i>{{ event.event_date.strftime('%B %d, %Y') }}
+                                    {% if event.location %}
+                                    <span class="ms-2"><i class="bi bi-geo-alt me-1"></i>{{ event.location }}</span>
+                                    {% endif %}
+                                </small>
+                            </div>
+                            <span class="badge bg-secondary">{{ event.event_type|title }}</span>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Holiday Calendar Sidebar -->
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header bg-warning text-dark">
+                        <h5 class="mb-0"><i class="bi bi-calendar-heart me-2"></i>Holidays</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        {% if holidays %}
+                        <div class="list-group list-group-flush">
+                            {% for holiday in holidays %}
+                            <div class="list-group-item">
+                                <div class="d-flex justify-content-between align-items-start">
+                                    <div>
+                                        <h6 class="mb-1">{{ holiday.name }}</h6>
+                                        <small class="text-muted">
+                                            {{ holiday.date.strftime('%B %d, %Y') }}
+                                            {% if holiday.end_date %}
+                                            - {{ holiday.end_date.strftime('%B %d, %Y') }}
+                                            {% endif %}
+                                        </small>
+                                    </div>
+                                    <span class="badge bg-{{ 'danger' if holiday.holiday_type == 'national' else 'info' if holiday.holiday_type == 'religious' else 'success' if holiday.holiday_type == 'vacation' else 'secondary' }}">{{ holiday.holiday_type|title }}</span>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <div class="p-4 text-center">
+                            <i class="bi bi-calendar-heart display-4 text-muted"></i>
+                            <p class="text-muted mt-2 mb-0">No upcoming holidays listed.</p>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

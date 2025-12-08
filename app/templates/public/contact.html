@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Contact Us - {{ site_settings.get('site_name', 'Sanskriti Vidyalaya') }}{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="bg-primary text-white py-5">
+    <div class="container">
+        <h1><i class="bi bi-envelope me-2"></i>Contact Us</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('public.home') }}" class="text-white-50">Home</a></li>
+                <li class="breadcrumb-item active text-white">Contact</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <!-- Contact Form -->
+            <div class="col-lg-7 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-send me-2"></i>Send us a Message</h5>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST">
+                            {{ form.hidden_tag() }}
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Your Name *</label>
+                                    {{ form.name(class="form-control", placeholder="Enter your name") }}
+                                    {% for error in form.name.errors %}
+                                        <small class="text-danger">{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Email Address *</label>
+                                    {{ form.email(class="form-control", placeholder="Enter your email") }}
+                                    {% for error in form.email.errors %}
+                                        <small class="text-danger">{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Phone Number</label>
+                                    {{ form.phone(class="form-control", placeholder="Enter your phone") }}
+                                    {% for error in form.phone.errors %}
+                                        <small class="text-danger">{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label class="form-label">Subject</label>
+                                    {{ form.subject(class="form-control", placeholder="Enter subject") }}
+                                    {% for error in form.subject.errors %}
+                                        <small class="text-danger">{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            </div>
+                            <div class="mb-3">
+                                <label class="form-label">Message *</label>
+                                {{ form.message(class="form-control", rows="5", placeholder="Write your message here...") }}
+                                {% for error in form.message.errors %}
+                                    <small class="text-danger">{{ error }}</small>
+                                {% endfor %}
+                            </div>
+                            <button type="submit" class="btn btn-primary">
+                                <i class="bi bi-send me-2"></i>Send Message
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Contact Info -->
+            <div class="col-lg-5">
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Contact Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-3">
+                                <div class="d-flex">
+                                    <div class="bg-primary text-white rounded-circle p-2 me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="bi bi-geo-alt"></i>
+                                    </div>
+                                    <div>
+                                        <strong>Address</strong>
+                                        <p class="mb-0 text-muted">{{ site_settings.get('address', 'School Address, City, State - PIN') }}</p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="mb-3">
+                                <div class="d-flex">
+                                    <div class="bg-primary text-white rounded-circle p-2 me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="bi bi-telephone"></i>
+                                    </div>
+                                    <div>
+                                        <strong>Phone</strong>
+                                        <p class="mb-0 text-muted">{{ site_settings.get('contact_phone', '+91 1234567890') }}</p>
+                                    </div>
+                                </div>
+                            </li>
+                            <li class="mb-3">
+                                <div class="d-flex">
+                                    <div class="bg-primary text-white rounded-circle p-2 me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="bi bi-envelope"></i>
+                                    </div>
+                                    <div>
+                                        <strong>Email</strong>
+                                        <p class="mb-0 text-muted">{{ site_settings.get('contact_email', 'info@school.edu') }}</p>
+                                    </div>
+                                </div>
+                            </li>
+                            {% for content in contents %}
+                            {% if content.section_key == 'timings' %}
+                            <li>
+                                <div class="d-flex">
+                                    <div class="bg-primary text-white rounded-circle p-2 me-3" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="bi bi-clock"></i>
+                                    </div>
+                                    <div>
+                                        <strong>{{ content.title }}</strong>
+                                        <div class="text-muted">{{ content.content|safe }}</div>
+                                    </div>
+                                </div>
+                            </li>
+                            {% endif %}
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Map -->
+                {% if site_settings.get('map_embed_url') %}
+                <div class="card shadow-sm">
+                    <div class="card-header bg-dark text-white">
+                        <h5 class="mb-0"><i class="bi bi-map me-2"></i>Location</h5>
+                    </div>
+                    <div class="card-body p-0">
+                        <iframe src="{{ site_settings.get('map_embed_url') }}" width="100%" height="300" style="border:0;" allowfullscreen="" loading="lazy"></iframe>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

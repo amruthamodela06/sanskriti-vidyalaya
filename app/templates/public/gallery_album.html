@@ -1,0 +1,76 @@
+{% extends "base.html" %}
+
+{% block title %}{{ album.title }} - Gallery - {{ site_settings.get('site_name', 'Sanskriti Vidyalaya') }}{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/glightbox/dist/css/glightbox.min.css">
+{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="bg-primary text-white py-5">
+    <div class="container">
+        <h1><i class="bi bi-images me-2"></i>{{ album.title }}</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('public.home') }}" class="text-white-50">Home</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('public.gallery') }}" class="text-white-50">Gallery</a></li>
+                <li class="breadcrumb-item active text-white">{{ album.title }}</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <!-- Album Info -->
+        <div class="mb-4">
+            {% if album.description %}
+            <p class="lead">{{ album.description }}</p>
+            {% endif %}
+            <div class="d-flex gap-3 text-muted">
+                {% if album.event_date %}
+                <span><i class="bi bi-calendar me-1"></i>{{ album.event_date.strftime('%B %d, %Y') }}</span>
+                {% endif %}
+                <span><i class="bi bi-image me-1"></i>{{ photos|length }} photos</span>
+                <span class="badge bg-primary">{{ album.category|title }}</span>
+            </div>
+        </div>
+
+        <!-- Photos Grid -->
+        {% if photos %}
+        <div class="row g-3">
+            {% for photo in photos %}
+            <div class="col-md-3 col-4">
+                <a href="{{ url_for('static', filename=photo.image_url) }}" class="glightbox" data-gallery="album" data-title="{{ photo.caption or '' }}">
+                    <img src="{{ url_for('static', filename=photo.thumbnail_url or photo.image_url) }}" class="img-fluid rounded gallery-image" alt="{{ photo.caption or 'Photo' }}" style="height: 150px; width: 100%; object-fit: cover;">
+                </a>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-image display-1 text-muted"></i>
+            <p class="text-muted mt-3">No photos in this album yet.</p>
+        </div>
+        {% endif %}
+
+        <!-- Back Button -->
+        <div class="mt-5">
+            <a href="{{ url_for('public.gallery') }}" class="btn btn-outline-primary">
+                <i class="bi bi-arrow-left me-2"></i>Back to Gallery
+            </a>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/glightbox/dist/js/glightbox.min.js"></script>
+<script>
+    const lightbox = GLightbox({
+        touchNavigation: true,
+        loop: true
+    });
+</script>
+{% endblock %}

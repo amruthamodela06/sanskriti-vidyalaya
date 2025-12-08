@@ -1,0 +1,147 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Inquiry - {{ inquiry.student_name }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-pencil-square me-2"></i>Admission Inquiry</h2>
+    <a href="{{ url_for('admin.admissions_list') }}" class="btn btn-outline-secondary">
+        <i class="bi bi-arrow-left me-1"></i>Back to List
+    </a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <!-- Student & Parent Details -->
+        <div class="card mb-4">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-person me-2"></i>Inquiry Details</h5>
+                <div>
+                    {% if inquiry.status == 'pending' %}
+                        <span class="badge bg-warning text-dark">Pending</span>
+                    {% elif inquiry.status == 'contacted' %}
+                        <span class="badge bg-info">Contacted</span>
+                    {% elif inquiry.status == 'admitted' %}
+                        <span class="badge bg-success">Admitted</span>
+                    {% elif inquiry.status == 'rejected' %}
+                        <span class="badge bg-danger">Rejected</span>
+                    {% endif %}
+                </div>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6 class="text-muted">Student Information</h6>
+                        <table class="table table-borderless">
+                            <tr>
+                                <th style="width: 40%;">Student Name:</th>
+                                <td>{{ inquiry.student_name }}</td>
+                            </tr>
+                            <tr>
+                                <th>Class Applying:</th>
+                                <td>{{ inquiry.class_applying }}</td>
+                            </tr>
+                            {% if inquiry.previous_school %}
+                            <tr>
+                                <th>Previous School:</th>
+                                <td>{{ inquiry.previous_school }}</td>
+                            </tr>
+                            {% endif %}
+                        </table>
+                    </div>
+                    <div class="col-md-6">
+                        <h6 class="text-muted">Contact Information</h6>
+                        <table class="table table-borderless">
+                            <tr>
+                                <th style="width: 40%;">Parent Name:</th>
+                                <td>{{ inquiry.parent_name }}</td>
+                            </tr>
+                            <tr>
+                                <th>Email:</th>
+                                <td><a href="mailto:{{ inquiry.email }}">{{ inquiry.email }}</a></td>
+                            </tr>
+                            <tr>
+                                <th>Phone:</th>
+                                <td><a href="tel:{{ inquiry.phone }}">{{ inquiry.phone }}</a></td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+
+                {% if inquiry.message %}
+                <hr>
+                <h6 class="text-muted">Additional Information</h6>
+                <div class="bg-light p-3 rounded" style="white-space: pre-wrap;">{{ inquiry.message }}</div>
+                {% endif %}
+
+                <hr>
+                <small class="text-muted">
+                    <i class="bi bi-clock me-1"></i>Submitted on {{ inquiry.created_at.strftime('%B %d, %Y at %I:%M %p') }}
+                </small>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <!-- Update Status -->
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="mb-0"><i class="bi bi-gear me-2"></i>Update Status</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label">Status</label>
+                        <select name="status" class="form-select">
+                            <option value="pending" {{ 'selected' if inquiry.status == 'pending' }}>Pending</option>
+                            <option value="contacted" {{ 'selected' if inquiry.status == 'contacted' }}>Contacted</option>
+                            <option value="admitted" {{ 'selected' if inquiry.status == 'admitted' }}>Admitted</option>
+                            <option value="rejected" {{ 'selected' if inquiry.status == 'rejected' }}>Rejected</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" name="is_contacted" id="is_contacted" {{ 'checked' if inquiry.is_contacted }}>
+                            <label class="form-check-label" for="is_contacted">Contacted Parent</label>
+                        </div>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Admin Notes</label>
+                        <textarea name="admin_notes" class="form-control" rows="4" placeholder="Internal notes...">{{ inquiry.admin_notes or '' }}</textarea>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary w-100">
+                        <i class="bi bi-check-lg me-1"></i>Update
+                    </button>
+                </form>
+
+                <hr>
+                <a href="mailto:{{ inquiry.email }}?subject=Admission Inquiry - {{ inquiry.student_name }}" class="btn btn-outline-success w-100 mb-2">
+                    <i class="bi bi-envelope me-1"></i>Email Parent
+                </a>
+                <a href="tel:{{ inquiry.phone }}" class="btn btn-outline-info w-100">
+                    <i class="bi bi-telephone me-1"></i>Call Parent
+                </a>
+            </div>
+        </div>
+
+        <!-- Delete -->
+        <div class="card border-danger">
+            <div class="card-header bg-danger text-white">
+                <h5 class="mb-0"><i class="bi bi-exclamation-triangle me-2"></i>Danger Zone</h5>
+            </div>
+            <div class="card-body">
+                <p class="text-muted small">Permanently delete this inquiry.</p>
+                <form action="{{ url_for('admin.admission_delete', id=inquiry.id) }}" method="POST"
+                      onsubmit="return confirm('Are you sure you want to delete this inquiry?');">
+                    <button type="submit" class="btn btn-danger w-100">
+                        <i class="bi bi-trash me-1"></i>Delete Inquiry
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,195 @@
+/* Admin Panel Styles */
+
+:root {
+    --sidebar-width: 250px;
+}
+
+/* Wrapper */
+#wrapper {
+    min-height: 100vh;
+}
+
+/* Sidebar */
+#sidebar-wrapper {
+    width: var(--sidebar-width);
+    min-height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    transition: margin 0.3s ease-in-out;
+}
+
+#sidebar-wrapper .sidebar-heading {
+    font-size: 1.1rem;
+}
+
+#sidebar-wrapper .list-group-item {
+    padding: 0.75rem 1.25rem;
+    border-radius: 0;
+    transition: background-color 0.2s, padding-left 0.2s;
+}
+
+#sidebar-wrapper .list-group-item:hover {
+    background-color: rgba(255,255,255,0.1) !important;
+    padding-left: 1.5rem;
+}
+
+#sidebar-wrapper .list-group-item.active {
+    background-color: rgba(255,255,255,0.15) !important;
+    border-left: 3px solid #c9a227;
+}
+
+#sidebar-wrapper .list-group-item i {
+    width: 20px;
+}
+
+/* Page Content */
+#page-content-wrapper {
+    width: calc(100% - var(--sidebar-width));
+    margin-left: var(--sidebar-width);
+    min-height: 100vh;
+}
+
+/* Toggled State */
+#wrapper.toggled #sidebar-wrapper {
+    margin-left: calc(var(--sidebar-width) * -1);
+}
+
+#wrapper.toggled #page-content-wrapper {
+    width: 100%;
+    margin-left: 0;
+}
+
+/* Stats Cards */
+.card {
+    border: none;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+}
+
+.card-footer {
+    background: transparent;
+    border-top: 1px solid rgba(255,255,255,0.2);
+}
+
+/* Tables */
+.table {
+    margin-bottom: 0;
+}
+
+.table th {
+    border-top: none;
+    font-weight: 600;
+    color: #6c757d;
+    text-transform: uppercase;
+    font-size: 0.75rem;
+    letter-spacing: 0.5px;
+}
+
+.table td {
+    vertical-align: middle;
+}
+
+/* Forms */
+.form-label {
+    font-weight: 500;
+    margin-bottom: 0.4rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #1e3a5f;
+    box-shadow: 0 0 0 0.2rem rgba(30, 58, 95, 0.25);
+}
+
+/* Buttons */
+.btn-primary {
+    background: #1e3a5f;
+    border-color: #1e3a5f;
+}
+
+.btn-primary:hover {
+    background: #2d5a87;
+    border-color: #2d5a87;
+}
+
+.btn-group-sm .btn {
+    padding: 0.25rem 0.5rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    #sidebar-wrapper {
+        margin-left: calc(var(--sidebar-width) * -1);
+    }
+
+    #page-content-wrapper {
+        width: 100%;
+        margin-left: 0;
+    }
+
+    #wrapper.toggled #sidebar-wrapper {
+        margin-left: 0;
+    }
+
+    #wrapper.toggled #page-content-wrapper {
+        margin-left: var(--sidebar-width);
+    }
+}
+
+/* Dashboard Stats */
+.card.bg-primary,
+.card.bg-success,
+.card.bg-info,
+.card.bg-warning {
+    border-radius: 15px;
+}
+
+/* List Group in Cards */
+.list-group-flush .list-group-item {
+    border-left: 0;
+    border-right: 0;
+}
+
+.list-group-flush .list-group-item:first-child {
+    border-top: 0;
+}
+
+/* Badge */
+.badge {
+    font-weight: 500;
+}
+
+/* Card Header */
+.card-header {
+    background: #f8f9fa;
+    border-bottom: 1px solid #eee;
+    font-weight: 600;
+}
+
+.card-header.bg-primary,
+.card-header.bg-dark,
+.card-header.bg-warning {
+    background: inherit !important;
+}
+
+/* Alerts */
+.alert {
+    border: none;
+    border-radius: 8px;
+}
+
+/* Pagination */
+.pagination {
+    margin-bottom: 0;
+}
+
+.page-link {
+    color: #1e3a5f;
+}
+
+.page-item.active .page-link {
+    background-color: #1e3a5f;
+    border-color: #1e3a5f;
+}

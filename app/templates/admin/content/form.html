@@ -1,0 +1,77 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Edit Content{% endblock %}
+
+{% block extra_css %}
+<link href="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs5.min.css" rel="stylesheet">
+{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <div>
+        <h2><i class="bi bi-file-text me-2"></i>Edit Content</h2>
+        <p class="text-muted mb-0">Page: {{ content.page_key|title }} | Section: {{ content.section_key|replace('_', ' ')|title }}</p>
+    </div>
+    <a href="{{ url_for('admin.content_list') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="POST" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+
+            <div class="mb-3">
+                <label class="form-label">Section Title</label>
+                {{ form.title(class="form-control") }}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Content</label>
+                {{ form.content(class="form-control summernote") }}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Image</label>
+                {{ form.image(class="form-control") }}
+                {% if content.image_url %}
+                <img src="{{ url_for('static', filename=content.image_url) }}" class="img-thumbnail mt-2" style="max-height: 100px;">
+                {% endif %}
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <label class="form-label">Display Order</label>
+                    {{ form.order(class="form-control", type="number") }}
+                </div>
+                <div class="col-md-6 d-flex align-items-end">
+                    <div class="form-check">
+                        {{ form.is_active(class="form-check-input") }} {{ form.is_active.label(class="form-check-label") }}
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>Save</button>
+            <a href="{{ url_for('admin.content_list') }}" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/summernote@0.8.20/dist/summernote-bs5.min.js"></script>
+<script>
+$(document).ready(function() {
+    $('.summernote').summernote({
+        height: 300,
+        toolbar: [
+            ['style', ['style']],
+            ['font', ['bold', 'underline', 'clear']],
+            ['para', ['ul', 'ol', 'paragraph']],
+            ['table', ['table']],
+            ['insert', ['link', 'picture']],
+            ['view', ['fullscreen', 'codeview']]
+        ]
+    });
+});
+</script>
+{% endblock %}

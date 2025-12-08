@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+
+{% block title %}{{ blog.title }} - {{ site_settings.get('site_name', 'Sanskriti Vidyalaya') }}{% endblock %}
+
+{% block content %}
+<!-- Page Header -->
+<section class="bg-primary text-white py-5">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-3">
+                <li class="breadcrumb-item"><a href="{{ url_for('public.home') }}" class="text-white-50">Home</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('public.news') }}" class="text-white-50">News</a></li>
+                <li class="breadcrumb-item active text-white">{{ blog.title[:30] }}...</li>
+            </ol>
+        </nav>
+        <h1>{{ blog.title }}</h1>
+        <div class="d-flex gap-3 mt-3">
+            <span><i class="bi bi-calendar me-1"></i>{{ blog.published_at.strftime('%B %d, %Y') if blog.published_at else blog.created_at.strftime('%B %d, %Y') }}</span>
+            <span class="badge bg-{{ 'info' if blog.category == 'news' else 'success' if blog.category == 'blog' else 'warning' }}">{{ blog.category|title }}</span>
+            <span><i class="bi bi-eye me-1"></i>{{ blog.views }} views</span>
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                <!-- Featured Image -->
+                {% if blog.image_url %}
+                <img src="{{ url_for('static', filename=blog.image_url) }}" class="img-fluid rounded mb-4 w-100" alt="{{ blog.title }}" style="max-height: 400px; object-fit: cover;">
+                {% endif %}
+
+                <!-- Content -->
+                <article class="blog-content">
+                    {{ blog.content|safe }}
+                </article>
+
+                <!-- Share Buttons -->
+                <div class="mt-5 pt-4 border-top">
+                    <h6>Share this article:</h6>
+                    <div class="d-flex gap-2">
+                        <a href="https://www.facebook.com/sharer/sharer.php?u={{ request.url }}" target="_blank" class="btn btn-outline-primary btn-sm">
+                            <i class="bi bi-facebook"></i>
+                        </a>
+                        <a href="https://twitter.com/intent/tweet?url={{ request.url }}&text={{ blog.title }}" target="_blank" class="btn btn-outline-info btn-sm">
+                            <i class="bi bi-twitter"></i>
+                        </a>
+                        <a href="https://wa.me/?text={{ blog.title }} {{ request.url }}" target="_blank" class="btn btn-outline-success btn-sm">
+                            <i class="bi bi-whatsapp"></i>
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Back Button -->
+                <div class="mt-4">
+                    <a href="{{ url_for('public.news') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-left me-2"></i>Back to News
+                    </a>
+                </div>
+            </div>
+
+            <!-- Sidebar -->
+            <div class="col-lg-4">
+                {% if related %}
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0">Related Articles</h5>
+                    </div>
+                    <div class="list-group list-group-flush">
+                        {% for post in related %}
+                        <a href="{{ url_for('public.news_detail', slug=post.slug) }}" class="list-group-item list-group-item-action">
+                            <div class="d-flex">
+                                {% if post.image_url %}
+                                <img src="{{ url_for('static', filename=post.image_url) }}" class="rounded me-3" alt="{{ post.title }}" style="width: 60px; height: 60px; object-fit: cover;">
+                                {% endif %}
+                                <div>
+                                    <h6 class="mb-1">{{ post.title[:40] }}...</h6>
+                                    <small class="text-muted">{{ post.published_at.strftime('%b %d, %Y') if post.published_at else post.created_at.strftime('%b %d, %Y') }}</small>
+                                </div>
+                            </div>
+                        </a>
+                        {% endfor %}
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

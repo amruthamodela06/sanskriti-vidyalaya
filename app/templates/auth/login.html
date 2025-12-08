@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Login - {{ site_settings.get('site_name', 'Sanskriti Vidyalaya') }}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+        body {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .login-card {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+            max-width: 400px;
+            width: 100%;
+        }
+        .login-header {
+            background: linear-gradient(135deg, #1e3a5f 0%, #c9a227 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        .login-header i {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        .login-body {
+            padding: 30px;
+        }
+        .form-control:focus {
+            border-color: #c9a227;
+            box-shadow: 0 0 0 0.2rem rgba(201, 162, 39, 0.25);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #1e3a5f 0%, #2d5a87 100%);
+            border: none;
+        }
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #2d5a87 0%, #1e3a5f 100%);
+        }
+    </style>
+</head>
+<body>
+    <div class="login-card">
+        <div class="login-header">
+            <i class="bi bi-mortarboard-fill"></i>
+            <h4 class="mb-0">{{ site_settings.get('site_name', 'Sanskriti Vidyalaya') }}</h4>
+            <small>Admin Panel</small>
+        </div>
+        <div class="login-body">
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-sm py-2" role="alert">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST">
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                    <label class="form-label">Username</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-person"></i></span>
+                        {{ form.username(class="form-control", placeholder="Enter username") }}
+                    </div>
+                    {% for error in form.username.errors %}
+                        <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Password</label>
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                        {{ form.password(class="form-control", placeholder="Enter password") }}
+                    </div>
+                    {% for error in form.password.errors %}
+                        <small class="text-danger">{{ error }}</small>
+                    {% endfor %}
+                </div>
+                <div class="mb-3 form-check">
+                    {{ form.remember_me(class="form-check-input") }}
+                    {{ form.remember_me.label(class="form-check-label") }}
+                </div>
+                <button type="submit" class="btn btn-primary w-100">
+                    <i class="bi bi-box-arrow-in-right me-2"></i>Login
+                </button>
+            </form>
+            <div class="text-center mt-3">
+                <a href="{{ url_for('public.home') }}" class="text-muted text-decoration-none">
+                    <i class="bi bi-arrow-left me-1"></i>Back to Website
+                </a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

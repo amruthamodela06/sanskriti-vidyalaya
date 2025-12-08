@@ -1,0 +1,36 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+ENV/
+env/
+.venv/
+
+# Instance folder (local database)
+instance/
+
+# Environment variables
+.env
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Uploads (will be managed separately in production)
+app/static/uploads/*
+!app/static/uploads/.gitkeep
+
+# Logs
+*.log
+
+# Flask
+.webassets-cache

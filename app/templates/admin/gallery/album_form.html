@@ -1,0 +1,62 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-images me-2"></i>{{ title }}</h2>
+    <a href="{{ url_for('admin.gallery_albums') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back</a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        <form method="POST" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+
+            <div class="mb-3">
+                <label class="form-label">Album Title *</label>
+                {{ form.title(class="form-control") }}
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Category</label>
+                    {{ form.category(class="form-select") }}
+                </div>
+                <div class="col-md-6 mb-3">
+                    <label class="form-label">Event Date</label>
+                    {{ form.event_date(class="form-control", type="date") }}
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Description</label>
+                {{ form.description(class="form-control", rows="3") }}
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Cover Image</label>
+                {{ form.cover_image(class="form-control") }}
+                {% if album and album.cover_image %}
+                <img src="{{ url_for('static', filename=album.cover_image) }}" class="img-thumbnail mt-2" style="max-height: 100px;">
+                {% endif %}
+            </div>
+
+            <div class="row mb-4">
+                <div class="col-md-6">
+                    <label class="form-label">Display Order</label>
+                    {{ form.order(class="form-control", type="number") }}
+                </div>
+                <div class="col-md-6 d-flex align-items-end">
+                    <div class="form-check">
+                        {{ form.is_published(class="form-check-input") }} {{ form.is_published.label(class="form-check-label") }}
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="btn btn-primary"><i class="bi bi-check-lg me-1"></i>Save</button>
+            <a href="{{ url_for('admin.gallery_albums') }}" class="btn btn-outline-secondary">Cancel</a>
+        </form>
+    </div>
+</div>
+{% endblock %}

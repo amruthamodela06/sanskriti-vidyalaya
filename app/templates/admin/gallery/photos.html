@@ -1,0 +1,61 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}{{ album.title }} - Photos{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-images me-2"></i>{{ album.title }}</h2>
+    <a href="{{ url_for('admin.gallery_albums') }}" class="btn btn-outline-secondary"><i class="bi bi-arrow-left me-1"></i>Back to Albums</a>
+</div>
+
+<!-- Upload Form -->
+<div class="card mb-4">
+    <div class="card-header"><h5 class="mb-0">Upload Photos</h5></div>
+    <div class="card-body">
+        <form method="POST" enctype="multipart/form-data">
+            {{ form.hidden_tag() }}
+            <div class="row align-items-end">
+                <div class="col-md-8 mb-3">
+                    {{ form.photos(class="form-control", multiple=true) }}
+                    <small class="text-muted">Select multiple images (JPG, PNG, GIF, WebP)</small>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <button type="submit" class="btn btn-primary w-100"><i class="bi bi-upload me-1"></i>Upload Photos</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Photos Grid -->
+<div class="card">
+    <div class="card-header"><h5 class="mb-0">Photos ({{ photos|length }})</h5></div>
+    <div class="card-body">
+        {% if photos %}
+        <div class="row g-3">
+            {% for photo in photos %}
+            <div class="col-md-3 col-6">
+                <div class="card h-100">
+                    <img src="{{ url_for('static', filename=photo.thumbnail_url or photo.image_url) }}" class="card-img-top" style="height: 150px; object-fit: cover;">
+                    <div class="card-body p-2">
+                        <small class="text-muted">{{ photo.caption or 'No caption' }}</small>
+                    </div>
+                    <div class="card-footer p-2 bg-transparent">
+                        <form action="{{ url_for('admin.photo_delete', id=photo.id) }}" method="POST" onsubmit="return confirm('Delete this photo?');">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <button type="submit" class="btn btn-sm btn-outline-danger w-100"><i class="bi bi-trash me-1"></i>Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-image display-1 text-muted"></i>
+            <p class="text-muted mt-3">No photos in this album. Upload some photos above.</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}
