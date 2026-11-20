@@ -4,10 +4,41 @@
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h2><i class="bi bi-newspaper me-2"></i>Blogs & News</h2>
+    <h2><i class="bi bi-newspaper me-2"></i>Blogs &amp; News</h2>
     <a href="{{ url_for('admin.blog_create') }}" class="btn btn-primary">
         <i class="bi bi-plus-lg me-1"></i>Add New
     </a>
+</div>
+
+<div class="card mb-3">
+    <div class="card-body py-2">
+        <form method="GET" class="row g-2 align-items-center">
+            <div class="col-md-5">
+                <input type="text" name="q" class="form-control form-control-sm" placeholder="Search by title..." value="{{ search_query or '' }}">
+            </div>
+            <div class="col-md-3">
+                <select name="category" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <option value="">All Categories</option>
+                    <option value="news" {{ 'selected' if current_category == 'news' }}>News</option>
+                    <option value="blog" {{ 'selected' if current_category == 'blog' }}>Blog</option>
+                    <option value="notice" {{ 'selected' if current_category == 'notice' }}>Notice</option>
+                </select>
+            </div>
+            <div class="col-md-2">
+                <select name="status" class="form-select form-select-sm" onchange="this.form.submit()">
+                    <option value="">All Status</option>
+                    <option value="published" {{ 'selected' if current_status == 'published' }}>Published</option>
+                    <option value="draft" {{ 'selected' if current_status == 'draft' }}>Draft</option>
+                </select>
+            </div>
+            <div class="col-md-2 d-flex gap-1">
+                <button type="submit" class="btn btn-sm btn-primary flex-grow-1"><i class="bi bi-search"></i></button>
+                {% if search_query or current_category or current_status %}
+                <a href="{{ url_for('admin.blogs_list') }}" class="btn btn-sm btn-outline-secondary" title="Reset"><i class="bi bi-x-lg"></i></a>
+                {% endif %}
+            </div>
+        </form>
+    </div>
 </div>
 
 <div class="card">
@@ -68,14 +99,14 @@
             <ul class="pagination justify-content-center mb-0">
                 {% if blogs.has_prev %}
                 <li class="page-item">
-                    <a class="page-link" href="{{ url_for('admin.blogs_list', page=blogs.prev_num) }}">Previous</a>
+                    <a class="page-link" href="{{ url_for('admin.blogs_list', page=blogs.prev_num, category=current_category or None, status=current_status or None, q=search_query or None) }}">Previous</a>
                 </li>
                 {% endif %}
 
                 {% for page_num in blogs.iter_pages() %}
                     {% if page_num %}
                         <li class="page-item {{ 'active' if page_num == blogs.page }}">
-                            <a class="page-link" href="{{ url_for('admin.blogs_list', page=page_num) }}">{{ page_num }}</a>
+                            <a class="page-link" href="{{ url_for('admin.blogs_list', page=page_num, category=current_category or None, status=current_status or None, q=search_query or None) }}">{{ page_num }}</a>
                         </li>
                     {% else %}
                         <li class="page-item disabled"><span class="page-link">...</span></li>
@@ -84,7 +115,7 @@
 
                 {% if blogs.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="{{ url_for('admin.blogs_list', page=blogs.next_num) }}">Next</a>
+                    <a class="page-link" href="{{ url_for('admin.blogs_list', page=blogs.next_num, category=current_category or None, status=current_status or None, q=search_query or None) }}">Next</a>
                 </li>
                 {% endif %}
             </ul>

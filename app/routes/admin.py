@@ -66,9 +66,29 @@ def dashboard():
 @admin_required
 def blogs_list():
     page = request.args.get('page', 1, type=int)
-    blogs = Blog.query.order_by(Blog.created_at.desc()).paginate(
+    category = request.args.get('category', '').strip()
+    status = request.args.get('status', '').strip()
+    search_query = request.args.get('q', '').strip()
+
+    query = Blog.query
+    if category:
+        query = query.filter_by(category=category)
+    if status == 'published':
+        query = query.filter_by(is_published=True)
+    elif status == 'draft':
+        query = query.filter_by(is_published=False)
+    if search_query:
+        query = query.filter(Blog.title.ilike(f"%{search_query}%"))
+
+    blogs = query.order_by(Blog.created_at.desc()).paginate(
         page=page, per_page=current_app.config['ITEMS_PER_PAGE'])
-    return render_template('admin/blogs/list.html', blogs=blogs)
+    return render_template(
+        'admin/blogs/list.html',
+        blogs=blogs,
+        current_category=category,
+        current_status=status,
+        search_query=search_query
+    )
 
 @admin_bp.route('/blogs/new', methods=['GET', 'POST'])
 @admin_required
