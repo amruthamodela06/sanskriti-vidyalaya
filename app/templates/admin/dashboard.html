@@ -7,7 +7,7 @@
 
 <!-- Stats Cards -->
 <div class="row g-4 mb-4">
-    <div class="col-md-3">
+    <div class="col-md-4 col-xl-2">
         <div class="card bg-primary text-white h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
@@ -15,7 +15,7 @@
                         <h3 class="mb-0">{{ stats.blogs }}</h3>
                         <small>Blog Posts</small>
                     </div>
-                    <i class="bi bi-newspaper display-4 opacity-50"></i>
+                    <i class="bi bi-newspaper fs-1 opacity-50"></i>
                 </div>
             </div>
             <div class="card-footer bg-transparent border-0">
@@ -23,7 +23,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-4 col-xl-2">
         <div class="card bg-success text-white h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
@@ -31,7 +31,7 @@
                         <h3 class="mb-0">{{ stats.events }}</h3>
                         <small>Events</small>
                     </div>
-                    <i class="bi bi-calendar-event display-4 opacity-50"></i>
+                    <i class="bi bi-calendar-event fs-1 opacity-50"></i>
                 </div>
             </div>
             <div class="card-footer bg-transparent border-0">
@@ -39,7 +39,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-4 col-xl-2">
         <div class="card bg-info text-white h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
@@ -47,7 +47,7 @@
                         <h3 class="mb-0">{{ stats.albums }}</h3>
                         <small>Photo Albums</small>
                     </div>
-                    <i class="bi bi-images display-4 opacity-50"></i>
+                    <i class="bi bi-images fs-1 opacity-50"></i>
                 </div>
             </div>
             <div class="card-footer bg-transparent border-0">
@@ -55,7 +55,7 @@
             </div>
         </div>
     </div>
-    <div class="col-md-3">
+    <div class="col-md-4 col-xl-2">
         <div class="card bg-warning text-dark h-100">
             <div class="card-body">
                 <div class="d-flex justify-content-between align-items-center">
@@ -63,11 +63,43 @@
                         <h3 class="mb-0">{{ stats.messages }}</h3>
                         <small>Unread Messages</small>
                     </div>
-                    <i class="bi bi-envelope display-4 opacity-50"></i>
+                    <i class="bi bi-envelope fs-1 opacity-50"></i>
                 </div>
             </div>
             <div class="card-footer bg-transparent border-0">
                 <a href="{{ url_for('admin.messages_list') }}" class="text-dark text-decoration-none small">View all <i class="bi bi-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-xl-2">
+        <div class="card bg-danger text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="mb-0">{{ stats.pending_admissions }}</h3>
+                        <small>Pending Admissions</small>
+                    </div>
+                    <i class="bi bi-mortarboard fs-1 opacity-50"></i>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <a href="{{ url_for('admin.admissions_list', status='pending') }}" class="text-white text-decoration-none small">View all <i class="bi bi-arrow-right"></i></a>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4 col-xl-2">
+        <div class="card bg-secondary text-white h-100">
+            <div class="card-body">
+                <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                        <h3 class="mb-0">{{ stats.staff }}</h3>
+                        <small>Active Staff</small>
+                    </div>
+                    <i class="bi bi-people fs-1 opacity-50"></i>
+                </div>
+            </div>
+            <div class="card-footer bg-transparent border-0">
+                <a href="{{ url_for('admin.staff_list') }}" class="text-white text-decoration-none small">View all <i class="bi bi-arrow-right"></i></a>
             </div>
         </div>
     </div>
@@ -144,8 +176,8 @@
     </div>
 
     <!-- Recent Messages -->
-    <div class="col-12">
-        <div class="card">
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h5 class="mb-0"><i class="bi bi-envelope me-2"></i>Recent Messages</h5>
                 <a href="{{ url_for('admin.messages_list') }}" class="btn btn-sm btn-outline-primary">View All</a>
@@ -183,6 +215,36 @@
                 <div class="p-4 text-center text-muted">
                     <i class="bi bi-envelope display-4"></i>
                     <p class="mt-2">No unread messages.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Admission Inquiries -->
+    <div class="col-lg-6 mb-4">
+        <div class="card h-100">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h5 class="mb-0"><i class="bi bi-mortarboard me-2"></i>Recent Admissions</h5>
+                <a href="{{ url_for('admin.admissions_list') }}" class="btn btn-sm btn-outline-primary">View All</a>
+            </div>
+            <div class="card-body p-0">
+                {% if recent_admissions %}
+                <div class="list-group list-group-flush">
+                    {% for inq in recent_admissions %}
+                    <a href="{{ url_for('admin.admission_detail', id=inq.id) }}" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                        <div>
+                            <h6 class="mb-1">{{ inq.student_name }} <small class="text-muted">({{ inq.class_applying }})</small></h6>
+                            <small class="text-muted">Parent: {{ inq.parent_name }} &middot; {{ inq.created_at.strftime('%b %d, %Y') }}</small>
+                        </div>
+                        <span class="badge bg-{{ 'warning text-dark' if inq.status == 'pending' else 'info' if inq.status == 'contacted' else 'success' if inq.status == 'admitted' else 'danger' }}">{{ inq.status|title }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+                {% else %}
+                <div class="p-4 text-center text-muted">
+                    <i class="bi bi-mortarboard display-4"></i>
+                    <p class="mt-2">No admission inquiries yet.</p>
                 </div>
                 {% endif %}
             </div>

@@ -26,17 +26,21 @@ def dashboard():
         'blogs': Blog.query.count(),
         'events': Event.query.count(),
         'albums': GalleryAlbum.query.count(),
-        'messages': ContactMessage.query.filter_by(is_read=False).count()
+        'messages': ContactMessage.query.filter_by(is_read=False).count(),
+        'pending_admissions': AdmissionInquiry.query.filter_by(status='pending').count(),
+        'staff': Staff.query.filter_by(is_active=True).count()
     }
     recent_blogs = Blog.query.order_by(Blog.created_at.desc()).limit(5).all()
     recent_messages = ContactMessage.query.filter_by(is_read=False).order_by(ContactMessage.created_at.desc()).limit(5).all()
     upcoming_events = Event.query.filter(Event.event_date >= datetime.now().date()).order_by(Event.event_date).limit(5).all()
+    recent_admissions = AdmissionInquiry.query.order_by(AdmissionInquiry.created_at.desc()).limit(5).all()
 
     return render_template('admin/dashboard.html',
                           stats=stats,
                           recent_blogs=recent_blogs,
                           recent_messages=recent_messages,
-                          upcoming_events=upcoming_events)
+                          upcoming_events=upcoming_events,
+                          recent_admissions=recent_admissions)
 
 # ============================================
 # Blog Management
