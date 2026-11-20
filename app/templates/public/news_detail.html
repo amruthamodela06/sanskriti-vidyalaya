@@ -54,6 +54,12 @@
                         <a href="https://wa.me/?text={{ blog.title }} {{ request.url }}" target="_blank" class="btn btn-outline-success btn-sm">
                             <i class="bi bi-whatsapp"></i>
                         </a>
+                        <button type="button" class="btn btn-outline-secondary btn-sm" id="copyArticleLinkBtn" data-url="{{ request.url }}">
+                            <i class="bi bi-link-45deg me-1"></i>Copy Link
+                        </button>
+                        <button type="button" class="btn btn-outline-dark btn-sm" onclick="window.print()">
+                            <i class="bi bi-printer me-1"></i>Print
+                        </button>
                     </div>
                 </div>
 
@@ -93,4 +99,28 @@
         </div>
     </div>
 </section>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const copyBtn = document.getElementById('copyArticleLinkBtn');
+    if (copyBtn) {
+        copyBtn.addEventListener('click', function() {
+            const url = this.getAttribute('data-url');
+            if (navigator.clipboard) {
+                navigator.clipboard.writeText(url).then(() => {
+                    const orig = copyBtn.innerHTML;
+                    copyBtn.innerHTML = '<i class="bi bi-check-lg me-1"></i>Copied!';
+                    copyBtn.classList.replace('btn-outline-secondary', 'btn-success');
+                    setTimeout(() => {
+                        copyBtn.innerHTML = orig;
+                        copyBtn.classList.replace('btn-success', 'btn-outline-secondary');
+                    }, 2000);
+                });
+            }
+        });
+    }
+});
+</script>
 {% endblock %}

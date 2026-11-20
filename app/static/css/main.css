@@ -277,3 +277,18 @@ section.bg-primary {
 #backToTopBtn:hover {
     transform: translateY(-3px);
 }
+
+/* Print-friendly article styles */
+@media print {
+    nav.navbar,
+    footer,
+    #backToTopBtn,
+    .btn {
+        display: none !important;
+    }
+    section.bg-primary {
+        background: #fff !important;
+        color: #000 !important;
+        padding: 1rem 0 !important;
+    }
+}
