@@ -28,6 +28,21 @@ document.addEventListener('DOMContentLoaded', function() {
     if (ticker) {
         ticker.innerHTML += ticker.innerHTML;
     }
+
+    // Back to top button visibility & scroll
+    const backToTopBtn = document.getElementById('backToTopBtn');
+    if (backToTopBtn) {
+        window.addEventListener('scroll', function() {
+            if (window.scrollY > 300) {
+                backToTopBtn.classList.add('show');
+            } else {
+                backToTopBtn.classList.remove('show');
+            }
+        });
+        backToTopBtn.addEventListener('click', function() {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    }
 });
 
 // nl2br filter simulation for Jinja

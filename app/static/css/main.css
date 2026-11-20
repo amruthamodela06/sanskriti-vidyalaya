@@ -249,3 +249,31 @@ section.bg-primary {
     background-color: var(--primary-color);
     border-color: var(--primary-color);
 }
+
+/* Active Nav Link */
+.navbar-dark .navbar-nav .nav-link.active {
+    color: var(--secondary-color) !important;
+    border-bottom: 2px solid var(--secondary-color);
+}
+
+/* Back to Top Button */
+#backToTopBtn {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 44px;
+    height: 44px;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 1050;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+#backToTopBtn.show {
+    display: flex;
+}
+
+#backToTopBtn:hover {
+    transform: translateY(-3px);
+}

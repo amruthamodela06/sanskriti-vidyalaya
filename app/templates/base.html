@@ -24,31 +24,31 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('public.home') }}">Home</a>
+                        <a class="nav-link {{ 'active fw-semibold' if request.endpoint == 'public.home' }}" href="{{ url_for('public.home') }}">Home</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('public.about') }}">About Us</a>
+                        <a class="nav-link {{ 'active fw-semibold' if request.endpoint == 'public.about' }}" href="{{ url_for('public.about') }}">About Us</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('public.faculty') }}">Faculty</a>
+                        <a class="nav-link {{ 'active fw-semibold' if request.endpoint == 'public.faculty' }}" href="{{ url_for('public.faculty') }}">Faculty</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('public.academics') }}">Academics</a>
+                        <a class="nav-link {{ 'active fw-semibold' if request.endpoint == 'public.academics' }}" href="{{ url_for('public.academics') }}">Academics</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('public.admissions') }}">Admissions</a>
+                        <a class="nav-link {{ 'active fw-semibold' if request.endpoint == 'public.admissions' }}" href="{{ url_for('public.admissions') }}">Admissions</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('public.gallery') }}">Gallery</a>
+                        <a class="nav-link {{ 'active fw-semibold' if request.endpoint in ['public.gallery', 'public.gallery_album'] }}" href="{{ url_for('public.gallery') }}">Gallery</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('public.news') }}">News</a>
+                        <a class="nav-link {{ 'active fw-semibold' if request.endpoint in ['public.news', 'public.news_detail'] }}" href="{{ url_for('public.news') }}">News</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('public.events') }}">Events</a>
+                        <a class="nav-link {{ 'active fw-semibold' if request.endpoint == 'public.events' }}" href="{{ url_for('public.events') }}">Events</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('public.contact') }}">Contact</a>
+                        <a class="nav-link {{ 'active fw-semibold' if request.endpoint == 'public.contact' }}" href="{{ url_for('public.contact') }}">Contact</a>
                     </li>
                 </ul>
             </div>
@@ -120,6 +120,11 @@
             </div>
         </div>
     </footer>
+
+    <!-- Back to Top Button -->
+    <button id="backToTopBtn" class="btn btn-primary rounded-circle shadow" title="Back to top" aria-label="Back to top">
+        <i class="bi bi-arrow-up"></i>
+    </button>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
