@@ -611,6 +611,27 @@ def message_delete(id):
     flash('Message deleted successfully.', 'success')
     return redirect(url_for('admin.messages_list'))
 
+
+@admin_bp.route('/messages/export')
+@admin_required
+def messages_export():
+    """Export contact messages as CSV."""
+    messages = ContactMessage.query.order_by(ContactMessage.created_at.desc()).all()
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['ID', 'Name', 'Email', 'Phone', 'Subject', 'Message', 'Read', 'Replied', 'Admin Notes', 'Received At'])
+    for msg in messages:
+        writer.writerow([
+            msg.id, msg.name, msg.email, msg.phone or '', msg.subject or '',
+            msg.message, 'Yes' if msg.is_read else 'No', 'Yes' if msg.is_replied else 'No',
+            msg.admin_notes or '', msg.created_at.strftime('%Y-%m-%d %H:%M:%S')
+        ])
+    return Response(
+        output.getvalue(),
+        mimetype='text/csv',
+        headers={'Content-Disposition': 'attachment; filename=contact-messages.csv'}
+    )
+
 # ============================================
 # Settings
 # ============================================
