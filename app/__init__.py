@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, render_template
 from app.extensions import db, login_manager, migrate, csrf
 from app.config import Config
 
@@ -43,6 +43,16 @@ def create_app(config_class=Config):
         except:
             settings = {}
         return dict(site_settings=settings, current_year=datetime.now().year)
+
+    # Error handlers
+    @app.errorhandler(404)
+    def not_found_error(error):
+        return render_template('errors/404.html'), 404
+
+    @app.errorhandler(500)
+    def internal_error(error):
+        db.session.rollback()
+        return render_template('errors/500.html'), 500
 
     # Create tables
     with app.app_context():
