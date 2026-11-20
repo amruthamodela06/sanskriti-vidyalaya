@@ -10,10 +10,11 @@ from app.models.contact_message import ContactMessage
 from app.models.settings import Setting
 from app.models.staff import Staff
 from app.models.admission import AdmissionInquiry
+from app.models.faq import FAQ
 
 __all__ = [
     'User', 'Blog', 'Event', 'Holiday',
     'GalleryAlbum', 'GalleryPhoto', 'Timetable',
     'StaticContent', 'Announcement', 'ContactMessage', 'Setting', 'Staff',
-    'AdmissionInquiry'
+    'AdmissionInquiry', 'FAQ'
 ]
