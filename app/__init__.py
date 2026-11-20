@@ -22,10 +22,12 @@ def create_app(config_class=Config):
     from app.routes.public import public_bp
     from app.routes.admin import admin_bp
     from app.routes.auth import auth_bp
+    from app.routes.api import api_bp
 
     app.register_blueprint(public_bp)
     app.register_blueprint(admin_bp, url_prefix='/admin')
     app.register_blueprint(auth_bp)
+    app.register_blueprint(api_bp, url_prefix='/api/v1')
 
     # User loader for Flask-Login
     from app.models.user import User
