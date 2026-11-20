@@ -144,18 +144,29 @@ def news_detail(slug):
 @public_bp.route('/events')
 def events():
     today = date.today()
+    event_type = request.args.get('type', '').strip()
 
     # Upcoming events
-    upcoming = Event.query.filter(
+    upcoming_query = Event.query.filter(
         Event.event_date >= today,
         Event.is_published == True
-    ).order_by(Event.event_date).all()
+    )
+    if event_type:
+        upcoming_query = upcoming_query.filter_by(event_type=event_type)
+    upcoming = upcoming_query.order_by(Event.event_date).all()
 
     # Past events
-    past = Event.query.filter(
+    past_query = Event.query.filter(
         Event.event_date < today,
         Event.is_published == True
-    ).order_by(Event.event_date.desc()).limit(10).all()
+    )
+    if event_type:
+        past_query = past_query.filter_by(event_type=event_type)
+    past = past_query.order_by(Event.event_date.desc()).limit(10).all()
+
+    # Available event types
+    types_rows = db.session.query(Event.event_type).filter(Event.is_published == True).distinct().all()
+    event_types = sorted({r[0] for r in types_rows if r[0]})
 
     # Holidays
     holidays = Holiday.query.filter(
@@ -165,7 +176,15 @@ def events():
     return render_template('public/events.html',
                           upcoming=upcoming,
                           past=past,
-                          holidays=holidays)
+                          holidays=holidays,
+                          event_types=event_types,
+                          current_type=event_type)
+
+
+@public_bp.route('/events/<int:id>')
+def event_detail(id):
+    event = Event.query.filter_by(id=id, is_published=True).first_or_404()
+    return render_template('public/event_detail.html', event=event)
 
 @public_bp.route('/contact', methods=['GET', 'POST'])
 def contact():

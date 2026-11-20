@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}{{ event.title }} - Events - {{ site_settings.get('site_name', 'Sanskriti Vidyalaya') }}{% endblock %}
+
+{% block content %}
+<section class="bg-primary text-white py-5">
+    <div class="container">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-3">
+                <li class="breadcrumb-item"><a href="{{ url_for('public.home') }}" class="text-white-50">Home</a></li>
+                <li class="breadcrumb-item"><a href="{{ url_for('public.events') }}" class="text-white-50">Events</a></li>
+                <li class="breadcrumb-item active text-white">{{ event.title }}</li>
+            </ol>
+        </nav>
+        <h1>{{ event.title }}</h1>
+        <div class="d-flex gap-3 mt-3 flex-wrap align-items-center">
+            <span class="badge bg-warning text-dark">{{ event.event_type|title }}</span>
+            <span><i class="bi bi-calendar me-1"></i>{{ event.event_date.strftime('%B %d, %Y') }}{% if event.end_date %} - {{ event.end_date.strftime('%B %d, %Y') }}{% endif %}</span>
+            {% if event.event_time %}
+            <span><i class="bi bi-clock me-1"></i>{{ event.event_time.strftime('%I:%M %p') }}</span>
+            {% endif %}
+            {% if event.location %}
+            <span><i class="bi bi-geo-alt me-1"></i>{{ event.location }}</span>
+            {% endif %}
+        </div>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-8">
+                {% if event.image_url %}
+                <img src="{{ url_for('static', filename=event.image_url) }}" class="img-fluid rounded shadow-sm mb-4 w-100" alt="{{ event.title }}" style="max-height: 420px; object-fit: cover;">
+                {% endif %}
+
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h4 class="mb-3">About This Event</h4>
+                        {% if event.description %}
+                        <div class="content-body">{{ event.description|nl2br }}</div>
+                        {% else %}
+                        <p class="text-muted mb-0">More details will be announced soon.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
+                <div class="mt-4 d-flex gap-2">
+                    <a href="{{ url_for('public.events') }}" class="btn btn-outline-primary">
+                        <i class="bi bi-arrow-left me-2"></i>Back to Events
+                    </a>
+                </div>
+            </div>
+
+            <div class="col-lg-4 mt-4 mt-lg-0">
+                <div class="card shadow-sm">
+                    <div class="card-header bg-primary text-white">
+                        <h5 class="mb-0"><i class="bi bi-info-circle me-2"></i>Event Summary</h5>
+                    </div>
+                    <div class="card-body">
+                        <ul class="list-unstyled mb-0">
+                            <li class="mb-2"><strong>Date:</strong> {{ event.event_date.strftime('%A, %B %d, %Y') }}</li>
+                            {% if event.end_date %}
+                            <li class="mb-2"><strong>End Date:</strong> {{ event.end_date.strftime('%A, %B %d, %Y') }}</li>
+                            {% endif %}
+                            {% if event.event_time %}
+                            <li class="mb-2"><strong>Time:</strong> {{ event.event_time.strftime('%I:%M %p') }}</li>
+                            {% endif %}
+                            {% if event.location %}
+                            <li class="mb-2"><strong>Venue:</strong> {{ event.location }}</li>
+                            {% endif %}
+                            <li><strong>Category:</strong> {{ event.event_type|title }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}

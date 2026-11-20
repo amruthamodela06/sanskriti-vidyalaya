@@ -21,7 +21,17 @@
         <div class="row">
             <!-- Upcoming Events -->
             <div class="col-lg-8 mb-4">
-                <h2 class="mb-4"><i class="bi bi-calendar-plus me-2"></i>Upcoming Events</h2>
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-2 mb-4">
+                    <h2 class="mb-0"><i class="bi bi-calendar-plus me-2"></i>Upcoming Events</h2>
+                    {% if event_types %}
+                    <div>
+                        <a href="{{ url_for('public.events') }}" class="btn btn-{{ 'primary' if not current_type else 'outline-primary' }} btn-sm me-1 mb-1">All</a>
+                        {% for et in event_types %}
+                        <a href="{{ url_for('public.events', type=et) }}" class="btn btn-{{ 'primary' if current_type == et else 'outline-primary' }} btn-sm me-1 mb-1">{{ et|title }}</a>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                </div>
                 {% if upcoming %}
                 <div class="row g-4">
                     {% for event in upcoming %}
@@ -30,7 +40,7 @@
                             {% if event.image_url %}
                                 <img src="{{ url_for('static', filename=event.image_url) }}" class="card-img-top" alt="{{ event.title }}" style="height: 150px; object-fit: cover;">
                             {% endif %}
-                            <div class="card-body">
+                            <div class="card-body d-flex flex-column">
                                 <div class="d-flex mb-3">
                                     <div class="event-date text-center bg-primary text-white rounded p-2 me-3" style="min-width: 60px;">
                                         <div class="fw-bold fs-4">{{ event.event_date.strftime('%d') }}</div>
@@ -38,19 +48,24 @@
                                     </div>
                                     <div>
                                         <span class="badge bg-{{ 'info' if event.event_type == 'academic' else 'success' if event.event_type == 'cultural' else 'warning' if event.event_type == 'sports' else 'secondary' }} mb-1">{{ event.event_type|title }}</span>
-                                        <h5 class="card-title mb-0">{{ event.title }}</h5>
+                                        <h5 class="card-title mb-0">
+                                            <a href="{{ url_for('public.event_detail', id=event.id) }}" class="text-decoration-none text-dark">{{ event.title }}</a>
+                                        </h5>
                                     </div>
                                 </div>
                                 {% if event.description %}
-                                <p class="card-text text-muted small">{{ event.description[:100] }}...</p>
+                                <p class="card-text text-muted small">{{ event.description|striptags_truncate(100) }}</p>
                                 {% endif %}
-                                <div class="text-muted small">
-                                    {% if event.event_time %}
-                                    <span><i class="bi bi-clock me-1"></i>{{ event.event_time.strftime('%I:%M %p') }}</span>
-                                    {% endif %}
-                                    {% if event.location %}
-                                    <span class="ms-3"><i class="bi bi-geo-alt me-1"></i>{{ event.location }}</span>
-                                    {% endif %}
+                                <div class="text-muted small mt-auto d-flex justify-content-between align-items-center">
+                                    <div>
+                                        {% if event.event_time %}
+                                        <span><i class="bi bi-clock me-1"></i>{{ event.event_time.strftime('%I:%M %p') }}</span>
+                                        {% endif %}
+                                        {% if event.location %}
+                                        <span class="ms-2"><i class="bi bi-geo-alt me-1"></i>{{ event.location }}</span>
+                                        {% endif %}
+                                    </div>
+                                    <a href="{{ url_for('public.event_detail', id=event.id) }}" class="btn btn-sm btn-outline-primary">Details</a>
                                 </div>
                             </div>
                         </div>
