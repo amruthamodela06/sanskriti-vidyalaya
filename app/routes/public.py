@@ -1,5 +1,5 @@
 from datetime import datetime, date
-from flask import Blueprint, render_template, request, flash, redirect, url_for, current_app
+from flask import Blueprint, render_template, request, flash, redirect, url_for, current_app, Response
 from app.extensions import db
 from app.models import (Blog, Event, Holiday, GalleryAlbum, GalleryPhoto,
                        Timetable, StaticContent, Announcement, ContactMessage, Staff,
@@ -237,3 +237,60 @@ def faculty():
                           available_departments=available_departments,
                           selected_dept=selected_dept,
                           search_query=search_query)
+
+
+@public_bp.route('/sitemap.xml')
+def sitemap():
+    """Generate dynamic XML sitemap for public pages, news, and albums."""
+    pages = []
+    static_endpoints = [
+        'public.home', 'public.about', 'public.academics', 'public.admissions',
+        'public.faculty', 'public.gallery', 'public.news', 'public.events', 'public.contact'
+    ]
+    for endpoint in static_endpoints:
+        pages.append({
+            'loc': url_for(endpoint, _external=True),
+            'changefreq': 'weekly',
+            'priority': '1.0' if endpoint == 'public.home' else '0.8'
+        })
+
+    blogs = Blog.query.filter_by(is_published=True).order_by(Blog.published_at.desc()).all()
+    for blog in blogs:
+        lastmod = (blog.updated_at or blog.published_at or blog.created_at).strftime('%Y-%m-%d')
+        pages.append({
+            'loc': url_for('public.news_detail', slug=blog.slug, _external=True),
+            'lastmod': lastmod,
+            'changefreq': 'monthly',
+            'priority': '0.7'
+        })
+
+    albums = GalleryAlbum.query.filter_by(is_published=True).order_by(GalleryAlbum.created_at.desc()).all()
+    for album in albums:
+        pages.append({
+            'loc': url_for('public.gallery_album', slug=album.slug, _external=True),
+            'lastmod': album.created_at.strftime('%Y-%m-%d'),
+            'changefreq': 'monthly',
+            'priority': '0.6'
+        })
+
+    xml_lines = ['<?xml version="1.0" encoding="UTF-8"?>',
+                 '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+    for page in pages:
+        xml_lines.append('  <url>')
+        xml_lines.append(f'    <loc>{page["loc"]}</loc>')
+        if 'lastmod' in page:
+            xml_lines.append(f'    <lastmod>{page["lastmod"]}</lastmod>')
+        xml_lines.append(f'    <changefreq>{page["changefreq"]}</changefreq>')
+        xml_lines.append(f'    <priority>{page["priority"]}</priority>')
+        xml_lines.append('  </url>')
+    xml_lines.append('</urlset>')
+
+    return Response('\n'.join(xml_lines), mimetype='application/xml')
+
+
+@public_bp.route('/robots.txt')
+def robots_txt():
+    """Serve robots.txt for search engine crawlers."""
+    sitemap_url = url_for('public.sitemap', _external=True)
+    content = f"User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /login\nSitemap: {sitemap_url}\n"
+    return Response(content, mimetype='text/plain')
