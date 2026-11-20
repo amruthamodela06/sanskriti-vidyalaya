@@ -16,6 +16,21 @@ from app.utils.helpers import save_uploaded_file, generate_slug, delete_file
 
 admin_bp = Blueprint('admin', __name__)
 
+
+@admin_bp.context_processor
+def inject_admin_badges():
+    """Inject unread message and pending admission counts for the admin sidebar."""
+    try:
+        unread_messages_count = ContactMessage.query.filter_by(is_read=False).count()
+        pending_admissions_count = AdmissionInquiry.query.filter_by(status='pending').count()
+    except Exception:
+        unread_messages_count = 0
+        pending_admissions_count = 0
+    return dict(
+        unread_messages_count=unread_messages_count,
+        pending_admissions_count=pending_admissions_count
+    )
+
 # ============================================
 # Dashboard
 # ============================================
