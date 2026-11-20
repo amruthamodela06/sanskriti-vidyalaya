@@ -693,9 +693,32 @@ def settings():
 @admin_required
 def staff_list():
     page = request.args.get('page', 1, type=int)
-    staff = Staff.query.order_by(Staff.order, Staff.name).paginate(
+    department = request.args.get('department', '').strip()
+    search_query = request.args.get('q', '').strip()
+
+    query = Staff.query
+    if department:
+        query = query.filter_by(department=department)
+    if search_query:
+        like_pattern = f"%{search_query}%"
+        query = query.filter(
+            db.or_(
+                Staff.name.ilike(like_pattern),
+                Staff.subjects_taught.ilike(like_pattern)
+            )
+        )
+
+    staff = query.order_by(Staff.order, Staff.name).paginate(
         page=page, per_page=current_app.config['ITEMS_PER_PAGE'])
-    return render_template('admin/staff/list.html', staff=staff)
+
+    depts = sorted({r[0] for r in db.session.query(Staff.department).distinct().all() if r[0]})
+    return render_template(
+        'admin/staff/list.html',
+        staff=staff,
+        departments=depts,
+        current_department=department,
+        search_query=search_query
+    )
 
 
 @admin_bp.route('/staff/new', methods=['GET', 'POST'])
