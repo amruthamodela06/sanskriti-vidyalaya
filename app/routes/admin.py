@@ -398,6 +398,20 @@ def album_photos(id):
     photos = album.photos.order_by(GalleryPhoto.order).all()
     return render_template('admin/gallery/photos.html', album=album, photos=photos, form=form)
 
+@admin_bp.route('/gallery/photo/<int:id>/edit', methods=['POST'])
+@admin_required
+def photo_edit(id):
+    photo = GalleryPhoto.query.get_or_404(id)
+    photo.caption = request.form.get('caption', '').strip() or None
+    try:
+        photo.order = int(request.form.get('order', 0))
+    except (TypeError, ValueError):
+        photo.order = 0
+    db.session.commit()
+    flash('Photo updated successfully.', 'success')
+    return redirect(url_for('admin.album_photos', id=photo.album_id))
+
+
 @admin_bp.route('/gallery/photo/<int:id>/delete', methods=['POST'])
 @admin_required
 def photo_delete(id):

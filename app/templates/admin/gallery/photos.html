@@ -38,7 +38,15 @@
                 <div class="card h-100">
                     <img src="{{ url_for('static', filename=photo.thumbnail_url or photo.image_url) }}" class="card-img-top" style="height: 150px; object-fit: cover;">
                     <div class="card-body p-2">
-                        <small class="text-muted">{{ photo.caption or 'No caption' }}</small>
+                        <form action="{{ url_for('admin.photo_edit', id=photo.id) }}" method="POST">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                            <input type="text" name="caption" class="form-control form-control-sm mb-1" placeholder="Caption..." value="{{ photo.caption or '' }}">
+                            <div class="input-group input-group-sm">
+                                <span class="input-group-text">Order</span>
+                                <input type="number" name="order" class="form-control" value="{{ photo.order or 0 }}">
+                                <button type="submit" class="btn btn-outline-primary" title="Save"><i class="bi bi-check-lg"></i></button>
+                            </div>
+                        </form>
                     </div>
                     <div class="card-footer p-2 bg-transparent">
                         <form action="{{ url_for('admin.photo_delete', id=photo.id) }}" method="POST" onsubmit="return confirm('Delete this photo?');">
