@@ -66,7 +66,14 @@
                             {% endif %}
                         </td>
                         <td><span class="badge bg-{{ 'info' if blog.category == 'news' else 'success' if blog.category == 'blog' else 'warning' }}">{{ blog.category|title }}</span></td>
-                        <td><span class="badge bg-{{ 'success' if blog.is_published else 'secondary' }}">{{ 'Published' if blog.is_published else 'Draft' }}</span></td>
+                        <td>
+                            <form action="{{ url_for('admin.blog_toggle_publish', id=blog.id) }}" method="POST" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm badge bg-{{ 'success' if blog.is_published else 'secondary' }} border-0" title="Click to toggle status">
+                                    {{ 'Published' if blog.is_published else 'Draft' }}
+                                </button>
+                            </form>
+                        </td>
                         <td>{{ blog.views }}</td>
                         <td>{{ blog.created_at.strftime('%b %d, %Y') }}</td>
                         <td>

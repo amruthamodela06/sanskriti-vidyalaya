@@ -160,6 +160,19 @@ def blog_delete(id):
     flash('Blog post deleted successfully.', 'success')
     return redirect(url_for('admin.blogs_list'))
 
+
+@admin_bp.route('/blogs/<int:id>/toggle-publish', methods=['POST'])
+@admin_required
+def blog_toggle_publish(id):
+    blog = Blog.query.get_or_404(id)
+    blog.is_published = not blog.is_published
+    if blog.is_published and not blog.published_at:
+        blog.published_at = datetime.utcnow()
+    db.session.commit()
+    status_label = 'published' if blog.is_published else 'moved to drafts'
+    flash(f'"{blog.title}" {status_label}.', 'success')
+    return redirect(request.referrer or url_for('admin.blogs_list'))
+
 # ============================================
 # Events Management
 # ============================================
