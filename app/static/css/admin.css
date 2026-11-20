@@ -193,3 +193,35 @@
     background-color: #1e3a5f;
     border-color: #1e3a5f;
 }
+
+/* Interactive Status Badges */
+button.badge {
+    cursor: pointer;
+    transition: transform 0.15s ease, opacity 0.15s ease;
+}
+
+button.badge:hover {
+    transform: scale(1.06);
+    opacity: 0.9;
+}
+
+/* Dashboard Stat Card Hover */
+.card.bg-primary,
+.card.bg-success,
+.card.bg-info,
+.card.bg-warning,
+.card.bg-danger,
+.card.bg-secondary {
+    border-radius: 15px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card.bg-primary:hover,
+.card.bg-success:hover,
+.card.bg-info:hover,
+.card.bg-warning:hover,
+.card.bg-danger:hover,
+.card.bg-secondary:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.14);
+}
