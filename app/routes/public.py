@@ -192,24 +192,48 @@ def contact():
 
 @public_bp.route('/faculty')
 def faculty():
-    # Get all active staff, ordered by order field then name
-    staff_members = Staff.query.filter_by(is_active=True).order_by(
-        Staff.order, Staff.name
-    ).all()
+    selected_dept = request.args.get('department', '').strip()
+    search_query = request.args.get('q', '').strip()
+
+    query = Staff.query.filter_by(is_active=True)
+    if search_query:
+        like_pattern = f"%{search_query}%"
+        query = query.filter(
+            db.or_(
+                Staff.name.ilike(like_pattern),
+                Staff.subjects_taught.ilike(like_pattern),
+                Staff.qualifications.ilike(like_pattern)
+            )
+        )
+
+    staff_members = query.order_by(Staff.order, Staff.name).all()
+
+    # Collect all available departments for filter pills
+    all_depts_rows = db.session.query(Staff.department).filter(
+        Staff.is_active == True,
+        Staff.department.isnot(None),
+        Staff.department != ''
+    ).distinct().all()
+    available_departments = sorted({row[0] for row in all_depts_rows})
 
     # Separate leadership (Principal, Vice Principal) from other staff
     leadership = []
     departments = {}
 
     for member in staff_members:
-        if member.designation in ['principal', 'vice_principal']:
+        if member.designation in ['principal', 'vice_principal'] and not selected_dept:
             leadership.append(member)
-        else:
+        elif member.designation not in ['principal', 'vice_principal']:
             dept = member.department or 'other'
+            if selected_dept and dept != selected_dept:
+                continue
             if dept not in departments:
                 departments[dept] = []
             departments[dept].append(member)
 
     return render_template('public/faculty.html',
                           leadership=leadership,
-                          departments=departments)
+                          departments=departments,
+                          available_departments=available_departments,
+                          selected_dept=selected_dept,
+                          search_query=search_query)
