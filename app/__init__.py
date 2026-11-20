@@ -54,6 +54,14 @@ def create_app(config_class=Config):
         db.session.rollback()
         return render_template('errors/500.html'), 500
 
+    @app.errorhandler(403)
+    def forbidden_error(error):
+        return render_template('errors/403.html'), 403
+
+    @app.errorhandler(413)
+    def payload_too_large_error(error):
+        return render_template('errors/403.html', message="The uploaded file exceeds the maximum allowed size (16MB)."), 413
+
     # Create tables
     with app.app_context():
         db.create_all()
