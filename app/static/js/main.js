@@ -43,6 +43,26 @@ document.addEventListener('DOMContentLoaded', function() {
             window.scrollTo({ top: 0, behavior: 'smooth' });
         });
     }
+
+    // Theme toggle with localStorage persistence
+    const themeToggleBtn = document.getElementById('themeToggleBtn');
+    const themeToggleIcon = document.getElementById('themeToggleIcon');
+    const applyTheme = (theme) => {
+        document.documentElement.setAttribute('data-bs-theme', theme);
+        if (themeToggleIcon) {
+            themeToggleIcon.className = theme === 'dark' ? 'bi bi-sun' : 'bi bi-moon-stars';
+        }
+    };
+    const savedTheme = localStorage.getItem('sv_theme') || 'light';
+    applyTheme(savedTheme);
+    if (themeToggleBtn) {
+        themeToggleBtn.addEventListener('click', function() {
+            const current = document.documentElement.getAttribute('data-bs-theme') === 'dark' ? 'dark' : 'light';
+            const next = current === 'dark' ? 'light' : 'dark';
+            localStorage.setItem('sv_theme', next);
+            applyTheme(next);
+        });
+    }
 });
 
 // nl2br filter simulation for Jinja
