@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for,
 from app.extensions import db
 from app.models import (Blog, Event, Holiday, GalleryAlbum, GalleryPhoto,
                        Timetable, StaticContent, Announcement, ContactMessage, Staff,
-                       AdmissionInquiry)
+                       AdmissionInquiry, FAQ)
 from app.forms.contact import ContactForm, AdmissionInquiryForm
 
 public_bp = Blueprint('public', __name__)
@@ -378,7 +378,7 @@ def sitemap():
     pages = []
     static_endpoints = [
         'public.home', 'public.about', 'public.academics', 'public.admissions',
-        'public.faculty', 'public.gallery', 'public.news', 'public.events', 'public.contact'
+        'public.faculty', 'public.gallery', 'public.news', 'public.events', 'public.faq', 'public.contact'
     ]
     for endpoint in static_endpoints:
         pages.append({
@@ -427,6 +427,18 @@ def robots_txt():
     sitemap_url = url_for('public.sitemap', _external=True)
     content = f"User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /login\nSitemap: {sitemap_url}\n"
     return Response(content, mimetype='text/plain')
+
+
+@public_bp.route('/faq')
+def faq():
+    """Public Frequently Asked Questions page with optional category filtering."""
+    category = request.args.get('category', '').strip()
+    query = FAQ.query.filter_by(is_active=True)
+    if category:
+        query = query.filter_by(category=category)
+    faqs = query.order_by(FAQ.order, FAQ.id).all()
+    categories = sorted({r[0] for r in db.session.query(FAQ.category).filter_by(is_active=True).distinct().all() if r[0]})
+    return render_template('public/faq.html', faqs=faqs, categories=categories, current_category=category)
 
 
 @public_bp.route('/search')
