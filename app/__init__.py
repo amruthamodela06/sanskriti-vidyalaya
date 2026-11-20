@@ -1,4 +1,5 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
+from sqlalchemy import text
 from app.extensions import db, login_manager, migrate, csrf
 from app.config import Config
 
@@ -89,6 +90,15 @@ def create_app(config_class=Config):
     @app.errorhandler(413)
     def payload_too_large_error(error):
         return render_template('errors/403.html', message="The uploaded file exceeds the maximum allowed size (16MB)."), 413
+
+    @app.route('/health')
+    def health_check():
+        """Lightweight health check endpoint verifying database connectivity."""
+        try:
+            db.session.execute(text('SELECT 1'))
+            return jsonify({'status': 'healthy', 'database': 'connected'}), 200
+        except Exception:
+            return jsonify({'status': 'unhealthy', 'database': 'disconnected'}), 503
 
     # Create tables
     with app.app_context():
