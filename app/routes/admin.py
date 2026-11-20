@@ -6,13 +6,14 @@ from flask_login import login_required, current_user
 from app.extensions import db
 from app.models import (User, Blog, Event, Holiday, GalleryAlbum, GalleryPhoto,
                        Timetable, StaticContent, Announcement, ContactMessage, Setting, Staff,
-                       AdmissionInquiry)
+                       AdmissionInquiry, FAQ)
 from app.forms.blog import BlogForm
 from app.forms.event import EventForm, HolidayForm
 from app.forms.gallery import AlbumForm, PhotoUploadForm, PhotoEditForm
 from app.forms.content import StaticContentForm, AnnouncementForm, TimetableForm
 from app.forms.contact import MessageReplyForm
 from app.forms.staff import StaffForm
+from app.forms.faq import FAQForm
 from app.utils.decorators import admin_required
 from app.utils.helpers import save_uploaded_file, generate_slug, delete_file
 
@@ -908,3 +909,59 @@ def admissions_export():
         mimetype='text/csv',
         headers={'Content-Disposition': f'attachment; filename={filename}'}
     )
+
+
+# ============================================
+# FAQ Management
+# ============================================
+@admin_bp.route('/faqs')
+@admin_required
+def faqs_list():
+    faqs = FAQ.query.order_by(FAQ.category, FAQ.order, FAQ.id).all()
+    return render_template('admin/faqs/list.html', faqs=faqs)
+
+
+@admin_bp.route('/faqs/new', methods=['GET', 'POST'])
+@admin_required
+def faq_create():
+    form = FAQForm()
+    if form.validate_on_submit():
+        faq = FAQ(
+            question=form.question.data,
+            answer=form.answer.data,
+            category=form.category.data,
+            order=form.order.data or 0,
+            is_active=form.is_active.data
+        )
+        db.session.add(faq)
+        db.session.commit()
+        flash('FAQ added successfully.', 'success')
+        return redirect(url_for('admin.faqs_list'))
+    return render_template('admin/faqs/form.html', form=form, title='Add FAQ')
+
+
+@admin_bp.route('/faqs/<int:id>/edit', methods=['GET', 'POST'])
+@admin_required
+def faq_edit(id):
+    faq = FAQ.query.get_or_404(id)
+    form = FAQForm(obj=faq)
+    if form.validate_on_submit():
+        faq.question = form.question.data
+        faq.answer = form.answer.data
+        faq.category = form.category.data
+        faq.order = form.order.data or 0
+        faq.is_active = form.is_active.data
+        db.session.commit()
+        flash('FAQ updated successfully.', 'success')
+        return redirect(url_for('admin.faqs_list'))
+    return render_template('admin/faqs/form.html', form=form, title='Edit FAQ', faq=faq)
+
+
+@admin_bp.route('/faqs/<int:id>/delete', methods=['POST'])
+@admin_required
+def faq_delete(id):
+    faq = FAQ.query.get_or_404(id)
+    db.session.delete(faq)
+    db.session.commit()
+    flash('FAQ deleted successfully.', 'success')
+    return redirect(url_for('admin.faqs_list'))
