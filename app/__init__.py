@@ -100,6 +100,15 @@ def create_app(config_class=Config):
         except Exception:
             return jsonify({'status': 'unhealthy', 'database': 'disconnected'}), 503
 
+    # Security headers
+    @app.after_request
+    def set_security_headers(response):
+        response.headers.setdefault('X-Content-Type-Options', 'nosniff')
+        response.headers.setdefault('X-Frame-Options', 'SAMEORIGIN')
+        response.headers.setdefault('Referrer-Policy', 'strict-origin-when-cross-origin')
+        response.headers.setdefault('Permissions-Policy', 'geolocation=(), microphone=(), camera=()')
+        return response
+
     # Create tables
     with app.app_context():
         db.create_all()
