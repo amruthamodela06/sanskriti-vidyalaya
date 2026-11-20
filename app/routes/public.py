@@ -60,9 +60,31 @@ def academics():
     contents = StaticContent.query.filter_by(
         page_key='academics', is_active=True
     ).order_by(StaticContent.order).all()
-    timetables = Timetable.query.filter_by(is_active=True).order_by(
-        Timetable.class_name, Timetable.section).all()
-    return render_template('public/academics.html', contents=contents, timetables=timetables)
+
+    selected_class = request.args.get('class_name', '').strip()
+    selected_year = request.args.get('academic_year', '').strip()
+
+    tt_query = Timetable.query.filter_by(is_active=True)
+    if selected_class:
+        tt_query = tt_query.filter_by(class_name=selected_class)
+    if selected_year:
+        tt_query = tt_query.filter_by(academic_year=selected_year)
+
+    timetables = tt_query.order_by(Timetable.class_name, Timetable.section).all()
+
+    all_active_tt = Timetable.query.filter_by(is_active=True).all()
+    available_classes = sorted({t.class_name for t in all_active_tt if t.class_name})
+    available_years = sorted({t.academic_year for t in all_active_tt if t.academic_year}, reverse=True)
+
+    return render_template(
+        'public/academics.html',
+        contents=contents,
+        timetables=timetables,
+        available_classes=available_classes,
+        available_years=available_years,
+        selected_class=selected_class,
+        selected_year=selected_year
+    )
 
 @public_bp.route('/admissions', methods=['GET', 'POST'])
 def admissions():
