@@ -105,15 +105,25 @@ def gallery_album(slug):
 def news():
     page = request.args.get('page', 1, type=int)
     category = request.args.get('category', '')
+    search_query = request.args.get('q', '').strip()
 
     query = Blog.query.filter_by(is_published=True)
     if category:
         query = query.filter_by(category=category)
+    if search_query:
+        like_pattern = f"%{search_query}%"
+        query = query.filter(
+            db.or_(
+                Blog.title.ilike(like_pattern),
+                Blog.excerpt.ilike(like_pattern),
+                Blog.content.ilike(like_pattern)
+            )
+        )
 
     blogs = query.order_by(Blog.published_at.desc()).paginate(
         page=page, per_page=current_app.config['ITEMS_PER_PAGE'])
 
-    return render_template('public/news.html', blogs=blogs, current_category=category)
+    return render_template('public/news.html', blogs=blogs, current_category=category, search_query=search_query)
 
 @public_bp.route('/news/<slug>')
 def news_detail(slug):

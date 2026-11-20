@@ -18,12 +18,30 @@
 
 <section class="py-5">
     <div class="container">
-        <!-- Category Filter -->
-        <div class="mb-4">
-            <a href="{{ url_for('public.news') }}" class="btn btn-{{ 'primary' if not current_category else 'outline-primary' }} btn-sm me-2">All</a>
-            <a href="{{ url_for('public.news', category='news') }}" class="btn btn-{{ 'primary' if current_category == 'news' else 'outline-primary' }} btn-sm me-2">News</a>
-            <a href="{{ url_for('public.news', category='blog') }}" class="btn btn-{{ 'primary' if current_category == 'blog' else 'outline-primary' }} btn-sm me-2">Blog</a>
-            <a href="{{ url_for('public.news', category='notice') }}" class="btn btn-{{ 'primary' if current_category == 'notice' else 'outline-primary' }} btn-sm me-2">Notices</a>
+        <!-- Category Filter & Search -->
+        <div class="row g-3 align-items-center mb-4">
+            <div class="col-md-7">
+                <a href="{{ url_for('public.news', q=search_query or None) }}" class="btn btn-{{ 'primary' if not current_category else 'outline-primary' }} btn-sm me-2 mb-1">All</a>
+                <a href="{{ url_for('public.news', category='news', q=search_query or None) }}" class="btn btn-{{ 'primary' if current_category == 'news' else 'outline-primary' }} btn-sm me-2 mb-1">News</a>
+                <a href="{{ url_for('public.news', category='blog', q=search_query or None) }}" class="btn btn-{{ 'primary' if current_category == 'blog' else 'outline-primary' }} btn-sm me-2 mb-1">Blog</a>
+                <a href="{{ url_for('public.news', category='notice', q=search_query or None) }}" class="btn btn-{{ 'primary' if current_category == 'notice' else 'outline-primary' }} btn-sm me-2 mb-1">Notices</a>
+            </div>
+            <div class="col-md-5">
+                <form method="GET" action="{{ url_for('public.news') }}" class="input-group input-group-sm">
+                    {% if current_category %}
+                    <input type="hidden" name="category" value="{{ current_category }}">
+                    {% endif %}
+                    <input type="text" name="q" class="form-control" placeholder="Search news, blogs, notices..." value="{{ search_query or '' }}">
+                    {% if search_query %}
+                    <a href="{{ url_for('public.news', category=current_category or None) }}" class="btn btn-outline-secondary" title="Clear search">
+                        <i class="bi bi-x-lg"></i>
+                    </a>
+                    {% endif %}
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </form>
+            </div>
         </div>
 
         <!-- News Grid -->
@@ -68,14 +86,14 @@
             <ul class="pagination justify-content-center">
                 {% if blogs.has_prev %}
                 <li class="page-item">
-                    <a class="page-link" href="{{ url_for('public.news', page=blogs.prev_num, category=current_category) }}">Previous</a>
+                    <a class="page-link" href="{{ url_for('public.news', page=blogs.prev_num, category=current_category or None, q=search_query or None) }}">Previous</a>
                 </li>
                 {% endif %}
 
                 {% for page_num in blogs.iter_pages() %}
                     {% if page_num %}
                         <li class="page-item {{ 'active' if page_num == blogs.page }}">
-                            <a class="page-link" href="{{ url_for('public.news', page=page_num, category=current_category) }}">{{ page_num }}</a>
+                            <a class="page-link" href="{{ url_for('public.news', page=page_num, category=current_category or None, q=search_query or None) }}">{{ page_num }}</a>
                         </li>
                     {% else %}
                         <li class="page-item disabled"><span class="page-link">...</span></li>
@@ -84,7 +102,7 @@
 
                 {% if blogs.has_next %}
                 <li class="page-item">
-                    <a class="page-link" href="{{ url_for('public.news', page=blogs.next_num, category=current_category) }}">Next</a>
+                    <a class="page-link" href="{{ url_for('public.news', page=blogs.next_num, category=current_category or None, q=search_query or None) }}">Next</a>
                 </li>
                 {% endif %}
             </ul>
