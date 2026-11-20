@@ -620,6 +620,17 @@ def announcement_delete(id):
     flash('Announcement deleted successfully.', 'success')
     return redirect(url_for('admin.announcements_list'))
 
+
+@admin_bp.route('/announcements/<int:id>/toggle', methods=['POST'])
+@admin_required
+def announcement_toggle(id):
+    announcement = Announcement.query.get_or_404(id)
+    announcement.is_active = not announcement.is_active
+    db.session.commit()
+    state = 'activated' if announcement.is_active else 'deactivated'
+    flash(f'Announcement {state}.', 'success')
+    return redirect(url_for('admin.announcements_list'))
+
 # ============================================
 # Contact Messages
 # ============================================

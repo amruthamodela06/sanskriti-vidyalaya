@@ -30,7 +30,14 @@
                         <td><span class="badge bg-{{ 'danger' if ann.announcement_type == 'urgent' else 'success' if ann.announcement_type == 'success' else 'info' }}">{{ ann.announcement_type|title }}</span></td>
                         <td>{{ ann.priority }}</td>
                         <td>{{ ann.start_date.strftime('%b %d') if ann.start_date else '-' }} - {{ ann.end_date.strftime('%b %d') if ann.end_date else '-' }}</td>
-                        <td><span class="badge bg-{{ 'success' if ann.is_active else 'secondary' }}">{{ 'Active' if ann.is_active else 'Inactive' }}</span></td>
+                        <td>
+                            <form action="{{ url_for('admin.announcement_toggle', id=ann.id) }}" method="POST" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm badge bg-{{ 'success' if ann.is_active else 'secondary' }} border-0" title="Click to toggle status">
+                                    {{ 'Active' if ann.is_active else 'Inactive' }}
+                                </button>
+                            </form>
+                        </td>
                         <td>
                             <div class="btn-group btn-group-sm">
                                 <a href="{{ url_for('admin.announcement_edit', id=ann.id) }}" class="btn btn-outline-primary"><i class="bi bi-pencil"></i></a>
