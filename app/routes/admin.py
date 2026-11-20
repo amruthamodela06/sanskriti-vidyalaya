@@ -797,6 +797,17 @@ def staff_delete(id):
     return redirect(url_for('admin.staff_list'))
 
 
+@admin_bp.route('/staff/<int:id>/toggle-active', methods=['POST'])
+@admin_required
+def staff_toggle_active(id):
+    staff = Staff.query.get_or_404(id)
+    staff.is_active = not staff.is_active
+    db.session.commit()
+    state = 'activated' if staff.is_active else 'deactivated'
+    flash(f'{staff.name} has been {state}.', 'success')
+    return redirect(request.referrer or url_for('admin.staff_list'))
+
+
 # ============================================
 # Admission Inquiries
 # ============================================

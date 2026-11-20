@@ -68,9 +68,12 @@
                         <td><span class="badge bg-info">{{ member.designation|replace('_', ' ')|title }}</span></td>
                         <td>{{ member.department|replace('_', ' ')|title if member.department else '-' }}</td>
                         <td>
-                            <span class="badge bg-{{ 'success' if member.is_active else 'secondary' }}">
-                                {{ 'Active' if member.is_active else 'Inactive' }}
-                            </span>
+                            <form action="{{ url_for('admin.staff_toggle_active', id=member.id) }}" method="POST" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm badge bg-{{ 'success' if member.is_active else 'secondary' }} border-0" title="Click to toggle status">
+                                    {{ 'Active' if member.is_active else 'Inactive' }}
+                                </button>
+                            </form>
                         </td>
                         <td>{{ member.order }}</td>
                         <td>
