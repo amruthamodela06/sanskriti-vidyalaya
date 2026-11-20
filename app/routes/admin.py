@@ -1,5 +1,7 @@
+import csv
+import io
 from datetime import datetime
-from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app
+from flask import Blueprint, render_template, redirect, url_for, flash, request, current_app, Response
 from flask_login import login_required, current_user
 from app.extensions import db
 from app.models import (User, Blog, Event, Holiday, GalleryAlbum, GalleryPhoto,
@@ -765,3 +767,32 @@ def admission_delete(id):
     db.session.commit()
     flash('Inquiry deleted successfully.', 'success')
     return redirect(url_for('admin.admissions_list'))
+
+
+@admin_bp.route('/admissions/export')
+@admin_required
+def admissions_export():
+    """Export admission inquiries (optionally filtered by status) as CSV."""
+    status = request.args.get('status', '')
+    query = AdmissionInquiry.query
+    if status:
+        query = query.filter_by(status=status)
+    inquiries = query.order_by(AdmissionInquiry.created_at.desc()).all()
+
+    output = io.StringIO()
+    writer = csv.writer(output)
+    writer.writerow(['ID', 'Student Name', 'Parent Name', 'Email', 'Phone', 'Class Applying', 'Previous School', 'Status', 'Contacted', 'Message', 'Admin Notes', 'Submitted At'])
+    for inq in inquiries:
+        writer.writerow([
+            inq.id, inq.student_name, inq.parent_name, inq.email, inq.phone,
+            inq.class_applying, inq.previous_school or '', inq.status,
+            'Yes' if inq.is_contacted else 'No', inq.message or '', inq.admin_notes or '',
+            inq.created_at.strftime('%Y-%m-%d %H:%M:%S')
+        ])
+
+    filename = f"admission-inquiries{'-' + status if status else ''}.csv"
+    return Response(
+        output.getvalue(),
+        mimetype='text/csv',
+        headers={'Content-Disposition': f'attachment; filename={filename}'}
+    )
