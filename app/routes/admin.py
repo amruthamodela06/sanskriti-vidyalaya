@@ -517,6 +517,17 @@ def timetable_delete(id):
     flash('Timetable deleted successfully.', 'success')
     return redirect(url_for('admin.timetables_list'))
 
+
+@admin_bp.route('/timetables/<int:id>/toggle', methods=['POST'])
+@admin_required
+def timetable_toggle(id):
+    timetable = Timetable.query.get_or_404(id)
+    timetable.is_active = not timetable.is_active
+    db.session.commit()
+    state = 'activated' if timetable.is_active else 'deactivated'
+    flash(f'Timetable {state}.', 'success')
+    return redirect(url_for('admin.timetables_list'))
+
 # ============================================
 # Static Content Management
 # ============================================
