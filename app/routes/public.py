@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for,
 from app.extensions import db
 from app.models import (Blog, Event, Holiday, GalleryAlbum, GalleryPhoto,
                        Timetable, StaticContent, Announcement, ContactMessage, Staff,
-                       AdmissionInquiry, FAQ, Testimonial)
+                       AdmissionInquiry, FAQ, Testimonial, DownloadResource)
 from app.forms.contact import ContactForm, AdmissionInquiryForm
 
 public_bp = Blueprint('public', __name__)
@@ -384,7 +384,8 @@ def sitemap():
     pages = []
     static_endpoints = [
         'public.home', 'public.about', 'public.academics', 'public.admissions',
-        'public.faculty', 'public.gallery', 'public.news', 'public.events', 'public.faq', 'public.contact'
+        'public.faculty', 'public.gallery', 'public.news', 'public.events',
+        'public.faq', 'public.downloads', 'public.contact'
     ]
     for endpoint in static_endpoints:
         pages.append({
@@ -445,6 +446,27 @@ def faq():
     faqs = query.order_by(FAQ.order, FAQ.id).all()
     categories = sorted({r[0] for r in db.session.query(FAQ.category).filter_by(is_active=True).distinct().all() if r[0]})
     return render_template('public/faq.html', faqs=faqs, categories=categories, current_category=category)
+
+
+@public_bp.route('/downloads')
+def downloads():
+    """Public Downloads & Circulars page with category filter."""
+    category = request.args.get('category', '').strip()
+    query = DownloadResource.query.filter_by(is_active=True)
+    if category:
+        query = query.filter_by(category=category)
+    resources = query.order_by(DownloadResource.created_at.desc()).all()
+    categories = sorted({r[0] for r in db.session.query(DownloadResource.category).filter_by(is_active=True).distinct().all() if r[0]})
+    return render_template('public/downloads.html', resources=resources, categories=categories, current_category=category)
+
+
+@public_bp.route('/downloads/<int:id>/file')
+def download_resource_file(id):
+    """Increment download counter and redirect to the static file."""
+    resource = DownloadResource.query.filter_by(id=id, is_active=True).first_or_404()
+    resource.download_count += 1
+    db.session.commit()
+    return redirect(url_for('static', filename=resource.file_url))
 
 
 @public_bp.route('/search')

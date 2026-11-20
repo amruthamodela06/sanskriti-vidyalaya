@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block title %}Downloads &amp; Circulars - {{ site_settings.get('site_name', 'Sanskriti Vidyalaya') }}{% endblock %}
+
+{% block content %}
+<section class="bg-primary text-white py-5">
+    <div class="container">
+        <h1><i class="bi bi-file-earmark-arrow-down me-2"></i>Downloads &amp; Circulars</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('public.home') }}" class="text-white-50">Home</a></li>
+                <li class="breadcrumb-item active text-white">Downloads</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        {% if categories %}
+        <div class="mb-4">
+            <a href="{{ url_for('public.downloads') }}" class="btn btn-{{ 'primary' if not current_category else 'outline-primary' }} btn-sm me-2 mb-2">All</a>
+            {% for cat in categories %}
+            <a href="{{ url_for('public.downloads', category=cat) }}" class="btn btn-{{ 'primary' if current_category == cat else 'outline-primary' }} btn-sm me-2 mb-2">{{ cat|title }}</a>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        {% if resources %}
+        <div class="row g-4">
+            {% for res in resources %}
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm">
+                    <div class="card-body d-flex justify-content-between align-items-start gap-3">
+                        <div>
+                            <span class="badge bg-info mb-2">{{ res.category|title }}</span>
+                            {% if res.academic_year %}
+                            <span class="badge bg-secondary mb-2">{{ res.academic_year }}</span>
+                            {% endif %}
+                            <h5 class="card-title mb-1">{{ res.title }}</h5>
+                            {% if res.description %}
+                            <p class="card-text text-muted small mb-2">{{ res.description }}</p>
+                            {% endif %}
+                            <small class="text-muted">
+                                <i class="bi bi-calendar me-1"></i>{{ res.created_at.strftime('%b %d, %Y') }}
+                                &middot; <i class="bi bi-download me-1"></i>{{ res.download_count }} downloads
+                            </small>
+                        </div>
+                        <a href="{{ url_for('public.download_resource_file', id=res.id) }}" target="_blank" class="btn btn-primary btn-sm flex-shrink-0">
+                            <i class="bi bi-download me-1"></i>Download
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="text-center py-5 bg-light rounded">
+            <i class="bi bi-file-earmark-arrow-down display-1 text-muted"></i>
+            <h4 class="mt-3">No Downloads Available</h4>
+            <p class="text-muted mb-0">Circulars, syllabus documents, and forms will appear here.</p>
+        </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}
