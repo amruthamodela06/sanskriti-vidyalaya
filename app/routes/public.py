@@ -1,4 +1,5 @@
 from datetime import datetime, date, timedelta
+from xml.sax.saxutils import escape as xml_escape
 from flask import Blueprint, render_template, request, flash, redirect, url_for, current_app, Response
 from app.extensions import db
 from app.models import (Blog, Event, Holiday, GalleryAlbum, GalleryPhoto,
@@ -149,6 +150,46 @@ def news_detail(slug):
     ).order_by(Blog.published_at.desc()).limit(3).all()
 
     return render_template('public/news_detail.html', blog=blog, related=related)
+
+
+@public_bp.route('/news/feed.xml')
+def news_feed():
+    """Serve an RSS 2.0 XML feed of the latest published news and notices."""
+    blogs = Blog.query.filter_by(is_published=True).order_by(
+        Blog.published_at.desc(), Blog.created_at.desc()
+    ).limit(20).all()
+
+    home_url = url_for('public.home', _external=True)
+    feed_url = url_for('public.news_feed', _external=True)
+    items_xml = []
+    for blog in blogs:
+        link = url_for('public.news_detail', slug=blog.slug, _external=True)
+        pub_dt = blog.published_at or blog.created_at
+        pub_str = pub_dt.strftime('%a, %d %b %Y %H:%M:%S +0000')
+        summary = xml_escape((blog.excerpt or blog.content or '')[:300])
+        items_xml.append(
+            f"    <item>\n"
+            f"      <title>{xml_escape(blog.title)}</title>\n"
+            f"      <link>{link}</link>\n"
+            f"      <guid>{link}</guid>\n"
+            f"      <pubDate>{pub_str}</pubDate>\n"
+            f"      <category>{xml_escape(blog.category or 'news')}</category>\n"
+            f"      <description>{summary}</description>\n"
+            f"    </item>"
+        )
+
+    rss_xml = (
+        '<?xml version="1.0" encoding="UTF-8"?>\n'
+        '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">\n'
+        '  <channel>\n'
+        '    <title>Sanskriti Vidyalaya - News &amp; Updates</title>\n'
+        f'    <link>{home_url}</link>\n'
+        f'    <atom:link href="{feed_url}" rel="self" type="application/rss+xml" />\n'
+        '    <description>Latest news, blog posts, and notices from Sanskriti Vidyalaya</description>\n'
+        + '\n'.join(items_xml) +
+        '\n  </channel>\n</rss>'
+    )
+    return Response(rss_xml, mimetype='application/rss+xml')
 
 @public_bp.route('/events')
 def events():

@@ -25,6 +25,7 @@
                 <a href="{{ url_for('public.news', category='news', q=search_query or None) }}" class="btn btn-{{ 'primary' if current_category == 'news' else 'outline-primary' }} btn-sm me-2 mb-1">News</a>
                 <a href="{{ url_for('public.news', category='blog', q=search_query or None) }}" class="btn btn-{{ 'primary' if current_category == 'blog' else 'outline-primary' }} btn-sm me-2 mb-1">Blog</a>
                 <a href="{{ url_for('public.news', category='notice', q=search_query or None) }}" class="btn btn-{{ 'primary' if current_category == 'notice' else 'outline-primary' }} btn-sm me-2 mb-1">Notices</a>
+                <a href="{{ url_for('public.news_feed') }}" class="btn btn-outline-warning btn-sm mb-1" title="RSS Feed" target="_blank"><i class="bi bi-rss"></i> RSS</a>
             </div>
             <div class="col-md-5">
                 <form method="GET" action="{{ url_for('public.news') }}" class="input-group input-group-sm">
