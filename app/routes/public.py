@@ -1,4 +1,4 @@
-from datetime import datetime, date
+from datetime import datetime, date, timedelta
 from flask import Blueprint, render_template, request, flash, redirect, url_for, current_app, Response
 from app.extensions import db
 from app.models import (Blog, Event, Holiday, GalleryAlbum, GalleryPhoto,
@@ -185,6 +185,48 @@ def events():
 def event_detail(id):
     event = Event.query.filter_by(id=id, is_published=True).first_or_404()
     return render_template('public/event_detail.html', event=event)
+
+
+@public_bp.route('/events/<int:id>/ics')
+def event_ics(id):
+    """Export a single school event as an iCalendar (.ics) file."""
+    event = Event.query.filter_by(id=id, is_published=True).first_or_404()
+    if event.event_time:
+        start_dt = datetime.combine(event.event_date, event.event_time)
+        end_dt = start_dt + timedelta(hours=2)
+        dtstart = f"DTSTART:{start_dt.strftime('%Y%m%dT%H%M%S')}"
+        dtend = f"DTEND:{end_dt.strftime('%Y%m%dT%H%M%S')}"
+    else:
+        end_date = (event.end_date or event.event_date) + timedelta(days=1)
+        dtstart = f"DTSTART;VALUE=DATE:{event.event_date.strftime('%Y%m%d')}"
+        dtend = f"DTEND;VALUE=DATE:{end_date.strftime('%Y%m%d')}"
+
+    description = (event.description or '').replace('\n', '\\n').replace('\r', '')
+    location = (event.location or '').replace('\n', ' ')
+    summary = event.title.replace('\n', ' ')
+    stamp = datetime.utcnow().strftime('%Y%m%dT%H%M%SZ')
+
+    ics_lines = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//Sanskriti Vidyalaya//School Events//EN',
+        'BEGIN:VEVENT',
+        f'UID:event-{event.id}@sanskritividyalaya',
+        f'DTSTAMP:{stamp}',
+        dtstart,
+        dtend,
+        f'SUMMARY:{summary}',
+        f'DESCRIPTION:{description}',
+        f'LOCATION:{location}',
+        'END:VEVENT',
+        'END:VCALENDAR',
+        ''
+    ]
+    return Response(
+        '\r\n'.join(ics_lines),
+        mimetype='text/calendar',
+        headers={'Content-Disposition': f'attachment; filename=event-{event.id}.ics'}
+    )
 
 @public_bp.route('/contact', methods=['GET', 'POST'])
 def contact():

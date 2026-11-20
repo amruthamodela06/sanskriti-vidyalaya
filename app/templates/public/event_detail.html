@@ -45,9 +45,12 @@
                     </div>
                 </div>
 
-                <div class="mt-4 d-flex gap-2">
+                <div class="mt-4 d-flex gap-2 flex-wrap">
                     <a href="{{ url_for('public.events') }}" class="btn btn-outline-primary">
                         <i class="bi bi-arrow-left me-2"></i>Back to Events
+                    </a>
+                    <a href="{{ url_for('public.event_ics', id=event.id) }}" class="btn btn-primary">
+                        <i class="bi bi-calendar-plus me-2"></i>Add to Calendar (.ics)
                     </a>
                 </div>
             </div>
