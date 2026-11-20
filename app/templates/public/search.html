@@ -1,0 +1,129 @@
+{% extends "base.html" %}
+
+{% block title %}Search{% if query_text %}: {{ query_text }}{% endif %} - {{ site_settings.get('site_name', 'Sanskriti Vidyalaya') }}{% endblock %}
+
+{% block content %}
+<section class="bg-primary text-white py-5">
+    <div class="container">
+        <h1><i class="bi bi-search me-2"></i>Site Search</h1>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb mb-0">
+                <li class="breadcrumb-item"><a href="{{ url_for('public.home') }}" class="text-white-50">Home</a></li>
+                <li class="breadcrumb-item active text-white">Search</li>
+            </ol>
+        </nav>
+    </div>
+</section>
+
+<section class="py-5">
+    <div class="container">
+        <form method="GET" action="{{ url_for('public.search') }}" class="mb-5">
+            <div class="input-group input-group-lg shadow-sm">
+                <input type="text" name="q" class="form-control" placeholder="Search news, events, faculty, gallery..." value="{{ query_text }}" autofocus>
+                <button type="submit" class="btn btn-primary px-4">
+                    <i class="bi bi-search me-1"></i>Search
+                </button>
+            </div>
+        </form>
+
+        {% if query_text %}
+            <p class="text-muted mb-4">
+                Found <strong>{{ total_results }}</strong> result{{ '' if total_results == 1 else 's' }} for "<strong>{{ query_text }}</strong>".
+            </p>
+
+            {% if total_results == 0 %}
+            <div class="text-center py-5 bg-light rounded">
+                <i class="bi bi-search display-1 text-muted"></i>
+                <h4 class="mt-3">No matching results</h4>
+                <p class="text-muted mb-0">Try different keywords or browse our sections from the navigation menu.</p>
+            </div>
+            {% endif %}
+
+            {% if blogs %}
+            <div class="mb-5">
+                <h3 class="mb-3"><i class="bi bi-newspaper me-2 text-primary"></i>News &amp; Articles ({{ blogs|length }})</h3>
+                <div class="list-group shadow-sm">
+                    {% for blog in blogs %}
+                    <a href="{{ url_for('public.news_detail', slug=blog.slug) }}" class="list-group-item list-group-item-action">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{ blog.title }}</h5>
+                            <small class="text-muted">{{ (blog.published_at or blog.created_at).strftime('%b %d, %Y') }}</small>
+                        </div>
+                        <p class="mb-1 text-muted small">{{ (blog.excerpt or blog.content)|striptags_truncate(150) }}</p>
+                        <span class="badge bg-info">{{ blog.category|title }}</span>
+                    </a>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if events %}
+            <div class="mb-5">
+                <h3 class="mb-3"><i class="bi bi-calendar-event me-2 text-primary"></i>Events ({{ events|length }})</h3>
+                <div class="list-group shadow-sm">
+                    {% for event in events %}
+                    <div class="list-group-item">
+                        <div class="d-flex w-100 justify-content-between">
+                            <h5 class="mb-1">{{ event.title }}</h5>
+                            <small class="text-muted">{{ event.event_date.strftime('%b %d, %Y') }}</small>
+                        </div>
+                        {% if event.description %}
+                        <p class="mb-1 text-muted small">{{ event.description|striptags_truncate(140) }}</p>
+                        {% endif %}
+                        {% if event.location %}
+                        <small class="text-muted"><i class="bi bi-geo-alt me-1"></i>{{ event.location }}</small>
+                        {% endif %}
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if staff_members %}
+            <div class="mb-5">
+                <h3 class="mb-3"><i class="bi bi-people me-2 text-primary"></i>Faculty ({{ staff_members|length }})</h3>
+                <div class="row g-3">
+                    {% for member in staff_members %}
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title mb-1">{{ member.name }}</h5>
+                                <p class="text-primary small mb-1">{{ member.designation|replace('_', ' ')|title }}</p>
+                                {% if member.subjects_taught %}
+                                <small class="text-muted d-block">{{ member.subjects_taught }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+
+            {% if albums %}
+            <div class="mb-5">
+                <h3 class="mb-3"><i class="bi bi-images me-2 text-primary"></i>Gallery Albums ({{ albums|length }})</h3>
+                <div class="row g-3">
+                    {% for album in albums %}
+                    <div class="col-md-4">
+                        <a href="{{ url_for('public.gallery_album', slug=album.slug) }}" class="card h-100 text-decoration-none">
+                            <div class="card-body">
+                                <h5 class="card-title text-dark">{{ album.title }}</h5>
+                                <small class="text-muted">{{ album.photos.count() }} photos</small>
+                            </div>
+                        </a>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-5 bg-light rounded">
+                <i class="bi bi-search display-1 text-muted"></i>
+                <h4 class="mt-3">Search {{ site_settings.get('site_name', 'Sanskriti Vidyalaya') }}</h4>
+                <p class="text-muted mb-0">Enter a keyword above to search across news, events, faculty, and photo albums.</p>
+            </div>
+        {% endif %}
+    </div>
+</section>
+{% endblock %}

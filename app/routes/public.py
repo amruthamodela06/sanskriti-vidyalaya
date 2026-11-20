@@ -294,3 +294,46 @@ def robots_txt():
     sitemap_url = url_for('public.sitemap', _external=True)
     content = f"User-agent: *\nAllow: /\nDisallow: /admin/\nDisallow: /login\nSitemap: {sitemap_url}\n"
     return Response(content, mimetype='text/plain')
+
+
+@public_bp.route('/search')
+def search():
+    """Global site search across news, events, staff, and gallery albums."""
+    query_text = request.args.get('q', '').strip()
+    blogs = []
+    events = []
+    staff_members = []
+    albums = []
+
+    if query_text:
+        pattern = f"%{query_text}%"
+        blogs = Blog.query.filter(
+            Blog.is_published == True,
+            db.or_(Blog.title.ilike(pattern), Blog.excerpt.ilike(pattern), Blog.content.ilike(pattern))
+        ).order_by(Blog.published_at.desc()).limit(12).all()
+
+        events = Event.query.filter(
+            Event.is_published == True,
+            db.or_(Event.title.ilike(pattern), Event.description.ilike(pattern), Event.location.ilike(pattern))
+        ).order_by(Event.event_date.desc()).limit(12).all()
+
+        staff_members = Staff.query.filter(
+            Staff.is_active == True,
+            db.or_(Staff.name.ilike(pattern), Staff.subjects_taught.ilike(pattern), Staff.department.ilike(pattern))
+        ).order_by(Staff.order, Staff.name).limit(12).all()
+
+        albums = GalleryAlbum.query.filter(
+            GalleryAlbum.is_published == True,
+            db.or_(GalleryAlbum.title.ilike(pattern), GalleryAlbum.description.ilike(pattern))
+        ).order_by(GalleryAlbum.created_at.desc()).limit(12).all()
+
+    total_results = len(blogs) + len(events) + len(staff_members) + len(albums)
+    return render_template(
+        'public/search.html',
+        query_text=query_text,
+        blogs=blogs,
+        events=events,
+        staff_members=staff_members,
+        albums=albums,
+        total_results=total_results
+    )
