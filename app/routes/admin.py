@@ -624,9 +624,19 @@ def announcement_delete(id):
 @admin_required
 def messages_list():
     page = request.args.get('page', 1, type=int)
-    messages = ContactMessage.query.order_by(ContactMessage.created_at.desc()).paginate(
+    status = request.args.get('status', '').strip()
+
+    query = ContactMessage.query
+    if status == 'unread':
+        query = query.filter_by(is_read=False)
+    elif status == 'unreplied':
+        query = query.filter_by(is_replied=False)
+    elif status == 'replied':
+        query = query.filter_by(is_replied=True)
+
+    messages = query.order_by(ContactMessage.created_at.desc()).paginate(
         page=page, per_page=current_app.config['ITEMS_PER_PAGE'])
-    return render_template('admin/messages.html', messages=messages)
+    return render_template('admin/messages.html', messages=messages, current_status=status)
 
 @admin_bp.route('/messages/<int:id>', methods=['GET', 'POST'])
 @admin_required
