@@ -254,6 +254,17 @@ def event_delete(id):
     flash('Event deleted successfully.', 'success')
     return redirect(url_for('admin.events_list'))
 
+
+@admin_bp.route('/events/<int:id>/toggle', methods=['POST'])
+@admin_required
+def event_toggle_publish(id):
+    event = Event.query.get_or_404(id)
+    event.is_published = not event.is_published
+    db.session.commit()
+    state = 'published' if event.is_published else 'moved to drafts'
+    flash(f'Event "{event.title}" {state}.', 'success')
+    return redirect(url_for('admin.events_list'))
+
 # ============================================
 # Holidays Management
 # ============================================

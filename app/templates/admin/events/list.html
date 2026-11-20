@@ -35,7 +35,14 @@
                         <td>{{ event.event_date.strftime('%b %d, %Y') }}{% if event.event_time %}<br><small class="text-muted">{{ event.event_time.strftime('%I:%M %p') }}</small>{% endif %}</td>
                         <td><span class="badge bg-info">{{ event.event_type|title }}</span></td>
                         <td>{{ event.location or '-' }}</td>
-                        <td><span class="badge bg-{{ 'success' if event.is_published else 'secondary' }}">{{ 'Published' if event.is_published else 'Draft' }}</span></td>
+                        <td>
+                            <form action="{{ url_for('admin.event_toggle_publish', id=event.id) }}" method="POST" class="d-inline">
+                                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                <button type="submit" class="btn btn-sm badge bg-{{ 'success' if event.is_published else 'secondary' }} border-0" title="Click to toggle status">
+                                    {{ 'Published' if event.is_published else 'Draft' }}
+                                </button>
+                            </form>
+                        </td>
                         <td>
                             <div class="btn-group btn-group-sm">
                                 <a href="{{ url_for('admin.event_edit', id=event.id) }}" class="btn btn-outline-primary"><i class="bi bi-pencil"></i></a>
