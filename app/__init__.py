@@ -44,6 +44,34 @@ def create_app(config_class=Config):
             settings = {}
         return dict(site_settings=settings, current_year=datetime.now().year)
 
+    # Custom Jinja2 template filters
+    import re
+    from markupsafe import Markup, escape
+
+    @app.template_filter('striptags_truncate')
+    def striptags_truncate(value, length=120):
+        if not value:
+            return ''
+        clean = re.sub(r'<[^>]+>', '', str(value)).strip()
+        if len(clean) <= length:
+            return clean
+        return clean[:length].rsplit(' ', 1)[0] + '...'
+
+    @app.template_filter('reading_time')
+    def reading_time(value):
+        if not value:
+            return '1 min read'
+        clean = re.sub(r'<[^>]+>', '', str(value))
+        words = len(clean.split())
+        minutes = max(1, round(words / 200))
+        return f"{minutes} min read"
+
+    @app.template_filter('nl2br')
+    def nl2br(value):
+        if not value:
+            return ''
+        return Markup('<br>'.join(escape(str(value)).splitlines()))
+
     # Error handlers
     @app.errorhandler(404)
     def not_found_error(error):

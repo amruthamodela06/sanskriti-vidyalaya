@@ -14,9 +14,10 @@
             </ol>
         </nav>
         <h1>{{ blog.title }}</h1>
-        <div class="d-flex gap-3 mt-3">
+        <div class="d-flex gap-3 mt-3 flex-wrap align-items-center">
             <span><i class="bi bi-calendar me-1"></i>{{ blog.published_at.strftime('%B %d, %Y') if blog.published_at else blog.created_at.strftime('%B %d, %Y') }}</span>
             <span class="badge bg-{{ 'info' if blog.category == 'news' else 'success' if blog.category == 'blog' else 'warning' }}">{{ blog.category|title }}</span>
+            <span><i class="bi bi-clock me-1"></i>{{ blog.content|reading_time }}</span>
             <span><i class="bi bi-eye me-1"></i>{{ blog.views }} views</span>
         </div>
     </div>

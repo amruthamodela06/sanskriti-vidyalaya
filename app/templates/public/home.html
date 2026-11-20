@@ -114,7 +114,7 @@
                             <div class="card-body">
                                 <span class="badge bg-{{ 'info' if blog.category == 'news' else 'success' if blog.category == 'blog' else 'warning' }} mb-2">{{ blog.category|title }}</span>
                                 <h5 class="card-title">{{ blog.title }}</h5>
-                                <p class="card-text text-muted small">{{ blog.excerpt[:100] if blog.excerpt else blog.content[:100] }}...</p>
+                                <p class="card-text text-muted small">{{ (blog.excerpt or blog.content)|striptags_truncate(100) }}</p>
                             </div>
                             <div class="card-footer bg-transparent">
                                 <small class="text-muted">

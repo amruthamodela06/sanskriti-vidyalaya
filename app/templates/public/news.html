@@ -47,7 +47,7 @@
                             {% endif %}
                         </div>
                         <h5 class="card-title">{{ blog.title }}</h5>
-                        <p class="card-text text-muted">{{ blog.excerpt[:120] if blog.excerpt else blog.content[:120] }}...</p>
+                        <p class="card-text text-muted">{{ (blog.excerpt or blog.content)|striptags_truncate(120) }}</p>
                     </div>
                     <div class="card-footer bg-transparent">
                         <div class="d-flex justify-content-between align-items-center">
