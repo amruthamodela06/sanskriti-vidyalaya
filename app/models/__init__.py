@@ -12,10 +12,11 @@ from app.models.staff import Staff
 from app.models.admission import AdmissionInquiry
 from app.models.faq import FAQ
 from app.models.testimonial import Testimonial
+from app.models.resource import DownloadResource
 
 __all__ = [
     'User', 'Blog', 'Event', 'Holiday',
     'GalleryAlbum', 'GalleryPhoto', 'Timetable',
     'StaticContent', 'Announcement', 'ContactMessage', 'Setting', 'Staff',
-    'AdmissionInquiry', 'FAQ', 'Testimonial'
+    'AdmissionInquiry', 'FAQ', 'Testimonial', 'DownloadResource'
 ]
