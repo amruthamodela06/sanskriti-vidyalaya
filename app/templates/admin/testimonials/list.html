@@ -1,0 +1,62 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Testimonials{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-chat-quote me-2"></i>Testimonials</h2>
+    <a href="{{ url_for('admin.testimonial_create') }}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Add Testimonial
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if testimonials %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Author</th>
+                        <th>Role</th>
+                        <th>Rating</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for item in testimonials %}
+                    <tr>
+                        <td>
+                            <strong>{{ item.author_name }}</strong>
+                            {% if item.is_featured %}<span class="badge bg-warning text-dark ms-1">Featured</span>{% endif %}
+                        </td>
+                        <td>{{ item.role }}</td>
+                        <td>
+                            {% for _ in range(item.rating or 5) %}<i class="bi bi-star-fill text-warning"></i>{% endfor %}
+                        </td>
+                        <td><span class="badge bg-{{ 'success' if item.is_active else 'secondary' }}">{{ 'Active' if item.is_active else 'Inactive' }}</span></td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ url_for('admin.testimonial_edit', id=item.id) }}" class="btn btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                                <form action="{{ url_for('admin.testimonial_delete', id=item.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this testimonial?');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-chat-quote display-1 text-muted"></i>
+            <h4 class="mt-3">No Testimonials Yet</h4>
+            <a href="{{ url_for('admin.testimonial_create') }}" class="btn btn-primary mt-2"><i class="bi bi-plus-lg me-1"></i>Add First Testimonial</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

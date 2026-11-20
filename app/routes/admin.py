@@ -6,7 +6,7 @@ from flask_login import login_required, current_user
 from app.extensions import db
 from app.models import (User, Blog, Event, Holiday, GalleryAlbum, GalleryPhoto,
                        Timetable, StaticContent, Announcement, ContactMessage, Setting, Staff,
-                       AdmissionInquiry, FAQ)
+                       AdmissionInquiry, FAQ, Testimonial)
 from app.forms.blog import BlogForm
 from app.forms.event import EventForm, HolidayForm
 from app.forms.gallery import AlbumForm, PhotoUploadForm, PhotoEditForm
@@ -14,6 +14,7 @@ from app.forms.content import StaticContentForm, AnnouncementForm, TimetableForm
 from app.forms.contact import MessageReplyForm
 from app.forms.staff import StaffForm
 from app.forms.faq import FAQForm
+from app.forms.testimonial import TestimonialForm
 from app.utils.decorators import admin_required
 from app.utils.helpers import save_uploaded_file, generate_slug, delete_file
 
@@ -965,3 +966,61 @@ def faq_delete(id):
     db.session.commit()
     flash('FAQ deleted successfully.', 'success')
     return redirect(url_for('admin.faqs_list'))
+
+
+# ============================================
+# Testimonials Management
+# ============================================
+@admin_bp.route('/testimonials')
+@admin_required
+def testimonials_list():
+    testimonials = Testimonial.query.order_by(Testimonial.created_at.desc()).all()
+    return render_template('admin/testimonials/list.html', testimonials=testimonials)
+
+
+@admin_bp.route('/testimonials/new', methods=['GET', 'POST'])
+@admin_required
+def testimonial_create():
+    form = TestimonialForm()
+    if form.validate_on_submit():
+        testimonial = Testimonial(
+            author_name=form.author_name.data,
+            role=form.role.data,
+            quote=form.quote.data,
+            rating=form.rating.data,
+            is_featured=form.is_featured.data,
+            is_active=form.is_active.data
+        )
+        db.session.add(testimonial)
+        db.session.commit()
+        flash('Testimonial added successfully.', 'success')
+        return redirect(url_for('admin.testimonials_list'))
+    return render_template('admin/testimonials/form.html', form=form, title='Add Testimonial')
+
+
+@admin_bp.route('/testimonials/<int:id>/edit', methods=['GET', 'POST'])
+@admin_required
+def testimonial_edit(id):
+    testimonial = Testimonial.query.get_or_404(id)
+    form = TestimonialForm(obj=testimonial)
+    if form.validate_on_submit():
+        testimonial.author_name = form.author_name.data
+        testimonial.role = form.role.data
+        testimonial.quote = form.quote.data
+        testimonial.rating = form.rating.data
+        testimonial.is_featured = form.is_featured.data
+        testimonial.is_active = form.is_active.data
+        db.session.commit()
+        flash('Testimonial updated successfully.', 'success')
+        return redirect(url_for('admin.testimonials_list'))
+    return render_template('admin/testimonials/form.html', form=form, title='Edit Testimonial', testimonial=testimonial)
+
+
+@admin_bp.route('/testimonials/<int:id>/delete', methods=['POST'])
+@admin_required
+def testimonial_delete(id):
+    testimonial = Testimonial.query.get_or_404(id)
+    db.session.delete(testimonial)
+    db.session.commit()
+    flash('Testimonial deleted successfully.', 'success')
+    return redirect(url_for('admin.testimonials_list'))

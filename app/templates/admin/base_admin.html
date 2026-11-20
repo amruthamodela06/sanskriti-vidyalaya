@@ -51,6 +51,9 @@
                 <a href="{{ url_for('admin.faqs_list') }}" class="list-group-item list-group-item-action bg-dark text-white border-0 {{ 'active' if 'faq' in request.endpoint }}">
                     <i class="bi bi-question-circle me-2"></i>FAQs
                 </a>
+                <a href="{{ url_for('admin.testimonials_list') }}" class="list-group-item list-group-item-action bg-dark text-white border-0 {{ 'active' if 'testimonial' in request.endpoint }}">
+                    <i class="bi bi-chat-quote me-2"></i>Testimonials
+                </a>
                 <a href="{{ url_for('admin.messages_list') }}" class="list-group-item list-group-item-action bg-dark text-white border-0 d-flex justify-content-between align-items-center {{ 'active' if 'message' in request.endpoint }}">
                     <span><i class="bi bi-envelope me-2"></i>Messages</span>
                     {% if unread_messages_count %}
