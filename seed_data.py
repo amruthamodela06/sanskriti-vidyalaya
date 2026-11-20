@@ -5,7 +5,7 @@ Run this after setting up the application: python seed_data.py
 
 from app import create_app
 from app.extensions import db
-from app.models import User, StaticContent, Setting
+from app.models import User, StaticContent, Setting, FAQ, Testimonial
 
 app = create_app()
 
@@ -45,6 +45,19 @@ SETTINGS_SEED = [
     {'key': 'instagram_url', 'value': '', 'value_type': 'string', 'description': 'Instagram profile URL'},
     {'key': 'youtube_url', 'value': '', 'value_type': 'string', 'description': 'YouTube channel URL'},
     {'key': 'current_academic_year', 'value': '2024-2025', 'value_type': 'string', 'description': 'Current academic year'},
+]
+
+FAQS_SEED = [
+    {'question': 'What are the school timings?', 'answer': 'Regular school hours are 8:30 AM to 3:00 PM, Monday through Saturday.', 'category': 'general', 'order': 1},
+    {'question': 'How do I apply for admission?', 'answer': 'You can submit an online admission inquiry on our Admissions page or visit the school office during working hours.', 'category': 'admissions', 'order': 2},
+    {'question': 'What documents are required at the time of admission?', 'answer': 'Birth certificate, previous school transfer certificate, recent report card, passport-size photographs, and address proof.', 'category': 'admissions', 'order': 3},
+    {'question': 'Does the school provide transport facilities?', 'answer': 'Yes, safe GPS-enabled school buses cover major routes across the city.', 'category': 'transport', 'order': 4},
+]
+
+TESTIMONIALS_SEED = [
+    {'author_name': 'Rajeshwar Rao', 'role': 'Parent of Class 8 Student', 'quote': 'Sanskriti Vidyalaya has nurtured both academic curiosity and strong moral values in my child.', 'rating': 5, 'is_featured': True, 'is_active': True},
+    {'author_name': 'Ananya Kulkarni', 'role': 'Alumni, Batch of 2022', 'quote': 'The supportive teachers and science labs gave me the confidence to excel in higher studies.', 'rating': 5, 'is_featured': True, 'is_active': True},
+    {'author_name': 'Meena Sharma', 'role': 'Parent of Class 4 Student', 'quote': 'A warm, disciplined, and encouraging environment where every student receives personal attention.', 'rating': 5, 'is_featured': True, 'is_active': True},
 ]
 
 
@@ -96,6 +109,20 @@ def seed_database():
             else:
                 print(f"  Skipped (exists): {setting_data['key']}")
         db.session.commit()
+
+        # Seed FAQs
+        if FAQ.query.count() == 0:
+            print("Seeding FAQs...")
+            for faq_data in FAQS_SEED:
+                db.session.add(FAQ(**faq_data))
+            db.session.commit()
+
+        # Seed Testimonials
+        if Testimonial.query.count() == 0:
+            print("Seeding testimonials...")
+            for item in TESTIMONIALS_SEED:
+                db.session.add(Testimonial(**item))
+            db.session.commit()
 
         print("\nDatabase seeding completed!")
         print("\n" + "="*50)
