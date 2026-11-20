@@ -90,6 +90,40 @@
     </div>
 </section>
 
+<!-- School Highlights -->
+{% if school_stats %}
+<section class="py-4 bg-primary text-white">
+    <div class="container">
+        <div class="row text-center g-3">
+            <div class="col-6 col-md-3">
+                <div class="p-2">
+                    <div class="fs-2 fw-bold text-warning">{{ school_stats.faculty_count }}</div>
+                    <div class="small text-white-50">Dedicated Faculty</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="p-2">
+                    <div class="fs-2 fw-bold text-warning">{{ school_stats.upcoming_events_count }}</div>
+                    <div class="small text-white-50">Upcoming Events</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="p-2">
+                    <div class="fs-2 fw-bold text-warning">{{ school_stats.news_count }}</div>
+                    <div class="small text-white-50">News &amp; Notices</div>
+                </div>
+            </div>
+            <div class="col-6 col-md-3">
+                <div class="p-2">
+                    <div class="fs-2 fw-bold text-warning">{{ school_stats.albums_count }}</div>
+                    <div class="small text-white-50">Photo Albums</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endif %}
+
 <!-- News & Events Row -->
 <section class="py-5">
     <div class="container">

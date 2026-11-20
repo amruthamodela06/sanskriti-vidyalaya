@@ -32,11 +32,20 @@ def home():
     albums = GalleryAlbum.query.filter_by(is_published=True).order_by(
         GalleryAlbum.created_at.desc()).limit(4).all()
 
+    # Dynamic school highlights stats
+    school_stats = {
+        'faculty_count': Staff.query.filter_by(is_active=True).count(),
+        'news_count': Blog.query.filter_by(is_published=True).count(),
+        'upcoming_events_count': Event.query.filter(Event.event_date >= today, Event.is_published == True).count(),
+        'albums_count': GalleryAlbum.query.filter_by(is_published=True).count()
+    }
+
     return render_template('public/home.html',
                           announcements=announcements,
                           news=news,
                           events=events,
-                          albums=albums)
+                          albums=albums,
+                          school_stats=school_stats)
 
 @public_bp.route('/about')
 def about():
