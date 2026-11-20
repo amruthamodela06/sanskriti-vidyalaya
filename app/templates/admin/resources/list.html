@@ -1,0 +1,60 @@
+{% extends "admin/base_admin.html" %}
+
+{% block title %}Downloads &amp; Circulars{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2><i class="bi bi-file-earmark-arrow-down me-2"></i>Downloads &amp; Circulars</h2>
+    <a href="{{ url_for('admin.resource_create') }}" class="btn btn-primary">
+        <i class="bi bi-plus-lg me-1"></i>Upload Resource
+    </a>
+</div>
+
+<div class="card">
+    <div class="card-body">
+        {% if resources %}
+        <div class="table-responsive">
+            <table class="table table-hover">
+                <thead>
+                    <tr>
+                        <th>Title</th>
+                        <th>Category</th>
+                        <th>Academic Year</th>
+                        <th>Downloads</th>
+                        <th>Status</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for res in resources %}
+                    <tr>
+                        <td><strong>{{ res.title }}</strong></td>
+                        <td><span class="badge bg-info">{{ res.category|title }}</span></td>
+                        <td>{{ res.academic_year or '-' }}</td>
+                        <td>{{ res.download_count }}</td>
+                        <td><span class="badge bg-{{ 'success' if res.is_active else 'secondary' }}">{{ 'Active' if res.is_active else 'Inactive' }}</span></td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ url_for('static', filename=res.file_url) }}" target="_blank" class="btn btn-outline-info" title="View File"><i class="bi bi-eye"></i></a>
+                                <a href="{{ url_for('admin.resource_edit', id=res.id) }}" class="btn btn-outline-primary"><i class="bi bi-pencil"></i></a>
+                                <form action="{{ url_for('admin.resource_delete', id=res.id) }}" method="POST" class="d-inline" onsubmit="return confirm('Delete this resource?');">
+                                    <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+                                    <button type="submit" class="btn btn-outline-danger"><i class="bi bi-trash"></i></button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% else %}
+        <div class="text-center py-5">
+            <i class="bi bi-file-earmark-arrow-down display-1 text-muted"></i>
+            <h4 class="mt-3">No Resources Uploaded</h4>
+            <a href="{{ url_for('admin.resource_create') }}" class="btn btn-primary mt-2"><i class="bi bi-plus-lg me-1"></i>Upload First Resource</a>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

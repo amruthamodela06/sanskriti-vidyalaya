@@ -6,7 +6,7 @@ from flask_login import login_required, current_user
 from app.extensions import db
 from app.models import (User, Blog, Event, Holiday, GalleryAlbum, GalleryPhoto,
                        Timetable, StaticContent, Announcement, ContactMessage, Setting, Staff,
-                       AdmissionInquiry, FAQ, Testimonial)
+                       AdmissionInquiry, FAQ, Testimonial, DownloadResource)
 from app.forms.blog import BlogForm
 from app.forms.event import EventForm, HolidayForm
 from app.forms.gallery import AlbumForm, PhotoUploadForm, PhotoEditForm
@@ -15,6 +15,7 @@ from app.forms.contact import MessageReplyForm
 from app.forms.staff import StaffForm
 from app.forms.faq import FAQForm
 from app.forms.testimonial import TestimonialForm
+from app.forms.resource import DownloadResourceForm
 from app.utils.decorators import admin_required
 from app.utils.helpers import save_uploaded_file, generate_slug, delete_file
 
@@ -1024,3 +1025,72 @@ def testimonial_delete(id):
     db.session.commit()
     flash('Testimonial deleted successfully.', 'success')
     return redirect(url_for('admin.testimonials_list'))
+
+
+# ============================================
+# Download Resources Management
+# ============================================
+@admin_bp.route('/resources')
+@admin_required
+def resources_list():
+    resources = DownloadResource.query.order_by(DownloadResource.created_at.desc()).all()
+    return render_template('admin/resources/list.html', resources=resources)
+
+
+@admin_bp.route('/resources/new', methods=['GET', 'POST'])
+@admin_required
+def resource_create():
+    form = DownloadResourceForm()
+    if form.validate_on_submit():
+        if not form.file.data:
+            flash('Please upload a document file.', 'danger')
+            return render_template('admin/resources/form.html', form=form, title='Add Resource')
+
+        file_url, _ = save_uploaded_file(form.file.data, 'resources')
+        resource = DownloadResource(
+            title=form.title.data,
+            description=form.description.data,
+            category=form.category.data,
+            file_url=file_url,
+            academic_year=form.academic_year.data,
+            is_active=form.is_active.data
+        )
+        db.session.add(resource)
+        db.session.commit()
+        flash('Resource uploaded successfully.', 'success')
+        return redirect(url_for('admin.resources_list'))
+    return render_template('admin/resources/form.html', form=form, title='Add Resource')
+
+
+@admin_bp.route('/resources/<int:id>/edit', methods=['GET', 'POST'])
+@admin_required
+def resource_edit(id):
+    resource = DownloadResource.query.get_or_404(id)
+    form = DownloadResourceForm(obj=resource)
+    if form.validate_on_submit():
+        resource.title = form.title.data
+        resource.description = form.description.data
+        resource.category = form.category.data
+        resource.academic_year = form.academic_year.data
+        resource.is_active = form.is_active.data
+        if form.file.data:
+            if resource.file_url:
+                delete_file(resource.file_url)
+            file_url, _ = save_uploaded_file(form.file.data, 'resources')
+            resource.file_url = file_url
+        db.session.commit()
+        flash('Resource updated successfully.', 'success')
+        return redirect(url_for('admin.resources_list'))
+    return render_template('admin/resources/form.html', form=form, title='Edit Resource', resource=resource)
+
+
+@admin_bp.route('/resources/<int:id>/delete', methods=['POST'])
+@admin_required
+def resource_delete(id):
+    resource = DownloadResource.query.get_or_404(id)
+    if resource.file_url:
+        delete_file(resource.file_url)
+    db.session.delete(resource)
+    db.session.commit()
+    flash('Resource deleted successfully.', 'success')
+    return redirect(url_for('admin.resources_list'))

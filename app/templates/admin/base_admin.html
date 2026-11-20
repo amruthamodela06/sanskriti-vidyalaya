@@ -42,6 +42,9 @@
                 <a href="{{ url_for('admin.timetables_list') }}" class="list-group-item list-group-item-action bg-dark text-white border-0 {{ 'active' if 'timetable' in request.endpoint }}">
                     <i class="bi bi-table me-2"></i>Timetables
                 </a>
+                <a href="{{ url_for('admin.resources_list') }}" class="list-group-item list-group-item-action bg-dark text-white border-0 {{ 'active' if 'resource' in request.endpoint }}">
+                    <i class="bi bi-file-earmark-arrow-down me-2"></i>Downloads
+                </a>
                 <a href="{{ url_for('admin.content_list') }}" class="list-group-item list-group-item-action bg-dark text-white border-0 {{ 'active' if 'content' in request.endpoint }}">
                     <i class="bi bi-file-text me-2"></i>Page Content
                 </a>
