@@ -4,7 +4,7 @@ from flask import Blueprint, render_template, request, flash, redirect, url_for,
 from app.extensions import db
 from app.models import (Blog, Event, Holiday, GalleryAlbum, GalleryPhoto,
                        Timetable, StaticContent, Announcement, ContactMessage, Staff,
-                       AdmissionInquiry, FAQ)
+                       AdmissionInquiry, FAQ, Testimonial)
 from app.forms.contact import ContactForm, AdmissionInquiryForm
 
 public_bp = Blueprint('public', __name__)
@@ -41,12 +41,18 @@ def home():
         'albums_count': GalleryAlbum.query.filter_by(is_published=True).count()
     }
 
+    # Featured testimonials
+    testimonials = Testimonial.query.filter_by(
+        is_active=True, is_featured=True
+    ).order_by(Testimonial.created_at.desc()).limit(3).all()
+
     return render_template('public/home.html',
                           announcements=announcements,
                           news=news,
                           events=events,
                           albums=albums,
-                          school_stats=school_stats)
+                          school_stats=school_stats,
+                          testimonials=testimonials)
 
 @public_bp.route('/about')
 def about():
